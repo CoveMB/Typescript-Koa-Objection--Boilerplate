@@ -1,0 +1,22 @@
+{
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "version": "v1",
+      "prodToken": "foo",
+      "nonProdToken": "bar"
+    },
+    "local": {
+      "host": "localhost",
+      "version": "v1",
+      "baseUrl": "http://localhost:3000/api",
+      "initialPassword": "Password@23",
+      "token": "{{$shared prodToken}}",
+    },
+    "production": {
+      "baseUrl": "https://mvp.tooly.ai/api",
+      "host": "mvp.tooly.ai",
+      "version": "v1",
+      "token": "{{$shared prodToken}}",
+    }
+  }
+}

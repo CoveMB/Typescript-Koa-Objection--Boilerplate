@@ -1,0 +1,56 @@
+version: "2.4"
+services:
+  #Node Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: node-${APP_NAME}
+    depends_on: 
+      - db
+    env_file: .env
+    ports:
+      - ${PORT}:${PORT}
+      # Port mapping for debug
+      - 9229:9229
+    volumes:
+      - .:/node/app:delegated
+      - /node/app/node_modules
+
+  #Postgres DB
+  db:
+    image: "postgres:12"
+    container_name: db-${APP_NAME}
+    logging:
+      driver: none
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PG_PRIMARY_PORT: ${DB_PORT}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - 5432:${DB_PORT}
+
+  #PGadmin service
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-${APP_NAME}
+    logging:
+      driver: none
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DB_USER}
+      PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - 8080:80
+
+#Volumes
+volumes:
+  postgres:
+  pgadmin:

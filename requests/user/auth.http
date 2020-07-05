@@ -1,0 +1,54 @@
+############### AUTH ###############
+
+### Login (one) ADMIN
+POST {{baseUrl}}/{{version}}/login
+Accept: */*
+content-type: application/json
+
+{
+    "email": "admin@email.com",
+    "password": "isAdmin@2000"
+}
+
+### Login (one) USER
+POST {{baseUrl}}/{{version}}/login
+Accept: */*
+content-type: application/json
+
+{
+    "email": "user@email.com",
+    "password": "isUser@2000"
+}
+
+### Logout (one)
+POST {{baseUrl}}/{{version}}/logout
+Accept: */*
+content-type: application/json
+Authorization: Bearer {{ $dotenv USER_TOKEN }}
+
+# {
+#     "token": {{ $dotenv USER_TOKEN }}
+# }
+
+
+### Logout (all)
+POST {{baseUrl}}/{{version}}/logoutAll
+Accept: */*
+content-type: application/json
+Authorization: Bearer {{ $dotenv USER_TOKEN }}
+
+### Check if the sent token is valid
+POST {{baseUrl}}/{{version}}/check-token
+Accept: */*
+content-type: application/json
+Authorization: Bearer {{ $dotenv USER_TOKEN }}
+
+
+### Reset Password
+POST {{baseUrl}}/{{version}}/request-reset-password
+Accept: */*
+content-type: application/json
+
+{
+    "email": "user@email.com"
+}
