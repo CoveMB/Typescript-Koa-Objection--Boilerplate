@@ -1,9 +1,18 @@
-const { NotAuthenticatedError, ExpiredTokenError } = require('config/errors/error.types');
-const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('config/variables');
-const BaseModelQueryBuilder = require('models/BaseModel.queries');
+import { NotAuthenticatedError, ExpiredTokenError } from 'config/errors/error.types';
+import jwt from 'jsonwebtoken';
+import { jwtSecret } from 'config/variables';
+import BaseQueryBuilder from 'models/Base.queries';
+import { Model, Page } from 'objection';
+import Token from './Token';
 
-class TokenQueryBuilder extends BaseModelQueryBuilder {
+export default class TokenQueryBuilder<M extends (Model | Token), R = M[]>
+  extends BaseQueryBuilder<M, R> {
+
+  // These are necessary.
+  ArrayQueryBuilderType!: TokenQueryBuilder<M, M[]>;
+  SingleQueryBuilderType!: TokenQueryBuilder<M, M>;
+  NumberQueryBuilderType!: TokenQueryBuilder<M, number>;
+  PageQueryBuilderType!: TokenQueryBuilder<M, Page<M>>;
 
   // Validate token, if it exist and if it is not expired than return it with the attached user
   async tokenWithUserGraphIfValid(token) {
@@ -91,5 +100,3 @@ class TokenQueryBuilder extends BaseModelQueryBuilder {
   }
 
 }
-
-module.exports = TokenQueryBuilder;

@@ -1,39 +1,43 @@
+/* eslint-disable no-param-reassign */
 import BaseModel from 'models/BaseModel';
-import { capitalize } from 'utils';
-import { Token } from 'models';
+import Token from 'models/User/Token/Token';
+import {
+  RelationMappings, Modifiers, QueryContext
+} from 'objection';
+import setUpUnique from 'objection-unique';
+import setUpPassword from 'objection-password';
 import validateUserInput from './user.validations';
 import UserQueryBuilder from './user.queries';
 
 // This plugin allow for automatic password hashing, if you want to allow an empty password you need to pass it allowEmptyPassword (this way user can register and set their password after validating their email)
-const Password = require('objection-password')({
+const Password = setUpPassword({
   allowEmptyPassword: true
 });
 
 // This plugin allow for unique validation on model
-const Unique = require('objection-unique')({
+const Unique = setUpUnique({
   fields     : [ 'email' ],
   identifiers: [ 'id' ]
 });
 
-export default class User extends Password(Unique(BaseModel)) {
+@Unique
+@Password
+export default class User extends BaseModel {
 
-  id!: number;
   uuid!: string;
   email!: string;
-  token!: Token;
+  password!: string;
+  admin!: boolean;
+  verifyPassword!: (password: string) => Promise<User>;
 
-  static get tableName() {
+  tokens?: Token[];
 
-    return 'user';
+  QueryBuilderType!: UserQueryBuilder<this>;
 
-  }
+  // This register the custom query builder
+  static QueryBuilder = UserQueryBuilder;
 
-  static get QueryBuilder() {
-
-    // This register the custom query builder
-    return UserQueryBuilder;
-
-  }
+  static tableName = 'user';
 
   static jsonSchema = {
     type    : 'object',
@@ -54,7 +58,7 @@ export default class User extends Password(Unique(BaseModel)) {
     }
   };
 
-  static relationMappings = () => ({
+  static relationMappings = (): RelationMappings => ({
     tokens: {
       relation  : BaseModel.HasManyRelation,
       modelClass: Token,
@@ -66,36 +70,24 @@ export default class User extends Password(Unique(BaseModel)) {
   });
 
   // Omit fields for json response from model
-  $formatJson(user) {
+  $formatJson(user: User): User {
 
     super.$formatJson(user);
 
     delete user.password;
     delete user.admin;
-    delete user.created_at;
-    delete user.updated_at;
+    delete user.createdAt;
+    delete user.updatedAt;
 
     return user;
 
   }
 
   // This hook triggers before an insert
-  async $beforeInsert(queryContext) {
+  async $beforeInsert(queryContext: QueryContext): Promise<void> {
 
     // Validate before password hashing
     validateUserInput(this);
-
-    if (this.country) {
-
-      this.country = capitalize(this.country);
-
-    }
-
-    if (this.name) {
-
-      this.name = capitalize(this.name);
-
-    }
 
     // Super will take care of hashing password
     await super.$beforeInsert(queryContext);
@@ -103,22 +95,10 @@ export default class User extends Password(Unique(BaseModel)) {
   }
 
   // This hook triggers before an update
-  async $beforeUpdate(opt, queryContext) {
+  async $beforeUpdate(opt, queryContext: QueryContext): Promise<void> {
 
     // Validate before password hashing
     validateUserInput(this);
-
-    if (this.country) {
-
-      this.country = capitalize(this.country);
-
-    }
-
-    if (this.name) {
-
-      this.country = capitalize(this.name);
-
-    }
 
     // Super will take care of hashing password
     await super.$beforeUpdate(opt, queryContext);
@@ -126,19 +106,16 @@ export default class User extends Password(Unique(BaseModel)) {
   }
 
   // Modifiers are reusable query snippets that can be used in various places.
-  static get modifiers() {
+  static modifiers: Modifiers = {
 
-    return {
+    // This modifier control the data that can be accessed depending of the authenticated user
+    graphQLAccessControl(builder: UserQueryBuilder<User>, user: User): void {
 
-      // This modifier control the data that can be accessed depending of the authenticated user
-      graphQLAccessControl(builder, user) {
+      // Only the authenticated user should be accessible
+      builder.where('id', user.id);
 
-        // Only the authenticated user should be accessible
-        builder.where('id', user.id);
+    }
 
-      }
-    };
-
-  }
+  };
 
 }

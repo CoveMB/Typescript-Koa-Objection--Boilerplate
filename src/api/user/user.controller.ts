@@ -1,8 +1,9 @@
-const { User, Token } = require('models');
-const { sendConfirmationEmail } = require('models/User/Token/token.emails');
+import { Context } from 'koa';
+import { Token, User } from 'models';
+import { sendConfirmationEmail } from 'models/User/Token/token.emails';
 
 // The user the the parameter comes from the authenticated middleware
-exports.getProfile = async ctx => {
+export const getProfile = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -23,7 +24,7 @@ exports.getProfile = async ctx => {
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-exports.getOne = async ctx => {
+export const getOne = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -43,7 +44,7 @@ exports.getOne = async ctx => {
 
 };
 
-exports.getAll = async ctx => {
+export const getAll = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -62,7 +63,7 @@ exports.getAll = async ctx => {
 
 };
 
-exports.createOne = async ctx => {
+export const createOne = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -93,7 +94,7 @@ exports.createOne = async ctx => {
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-exports.updateOne = async ctx => {
+export const updateOne = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -119,7 +120,7 @@ exports.updateOne = async ctx => {
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-exports.deleteOne = async ctx => {
+export const deleteOne = async (ctx: Context): Promise<void> => {
 
   try {
 

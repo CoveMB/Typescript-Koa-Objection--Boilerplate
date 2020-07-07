@@ -2,12 +2,13 @@ import { apiVersion } from 'config/variables';
 import fs from 'fs';
 import Router from 'koa-router';
 import path from 'path';
+import Koa from 'koa';
 
 const baseName = path.basename(__filename);
 
-const registerRouters = app => {
+const registerRouters = (app: Koa): Koa => {
 
-  const router = new Router({
+  const router: Router = new Router({
     prefix: `/api/${apiVersion}`,
   });
 
@@ -16,7 +17,7 @@ const registerRouters = app => {
     .filter(file => file.indexOf('.') !== 0 && file !== baseName)
     .forEach(file => {
 
-      const api = require(path.join(__dirname, file))(Router); // eslint-disable-line
+      const api: Router = require(path.join(__dirname, file))(Router); // eslint-disable-line
 
       router.use(api.routes());
 

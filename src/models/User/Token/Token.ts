@@ -1,31 +1,23 @@
 import BaseModel from 'models/BaseModel';
-import { User } from 'models';
+import User from 'models/User/User';
+import { RelationMappings, Modifiers, Model } from 'objection';
+import BaseQueryBuilder from 'models/Base.queries';
 import TokenQueryBuilder from './token.queries';
 
 export default class Token extends BaseModel {
 
-  id!: number;
   uuid!: string;
   userId!: number;
   device!: string;
-  expiration!: string;
+  expiration!: Date;
   token!: string;
   user!: User;
-  created_at!: string;
-  updated_at!: string;
 
-  static get tableName() {
+  QueryBuilderType!: TokenQueryBuilder<this>;
 
-    return 'token';
+  static tableName = 'token';
 
-  }
-
-  static get QueryBuilder() {
-
-    // This register the custom query builder
-    return TokenQueryBuilder;
-
-  }
+  static QueryBuilder = TokenQueryBuilder;
 
   static jsonSchema = {
 
@@ -47,41 +39,27 @@ export default class Token extends BaseModel {
     }
   };
 
-  static relationMappings = () => ({
-
-    // // eslint-disable-next-line global-require
-    // const { User } = require('models');
+  static relationMappings = (): RelationMappings => ({
     user: {
-      relation: BaseModel.BelongsToOneRelation,
-
+      relation  : BaseModel.BelongsToOneRelation,
       modelClass: User,
       join      : {
         from: 'token.user_id',
         to  : 'user.id'
       }
     },
-
   });
 
   // Modifiers are reusable query snippets that can be used in various places.
-  static get modifiers() {
+  static modifiers: Modifiers = {
 
-    return {
-      orderByCreation(builder) {
+    // This modifier control the data that can be accessed depending of the authenticated user
+    graphQLAccessControl(builder, user) {
 
-        builder.orderBy('created_at');
+      // Only the tokens from the authenticated user should be accessible
+      builder.where('user_id', user.id);
 
-      },
-
-      // This modifier control the data that can be accessed depending of the authenticated user
-      graphQLAccessControl(builder, user) {
-
-        // Only the tokens from the authenticated user should be accessible
-        builder.where('user_id', user.id);
-
-      }
-    };
-
-  }
+    }
+  };
 
 }

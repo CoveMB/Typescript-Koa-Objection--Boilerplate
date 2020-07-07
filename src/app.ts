@@ -5,7 +5,7 @@ import configServer from 'config/server';
 import { appName, port, isProduction } from 'config/variables';
 import { Model } from 'objection';
 
-const bootstrap = async () => {
+const bootstrap = async (): Promise<void> => {
 
   /**
   * Connect database

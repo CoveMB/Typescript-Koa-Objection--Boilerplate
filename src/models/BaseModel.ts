@@ -1,23 +1,32 @@
-import { Model } from 'objection';
-import BaseModelQueryBuilder from './BaseModel.queries';
+import { Model, Modifiers } from 'objection';
+import BaseQueryBuilder from './Base.queries';
 
 export default class BaseModel extends Model {
 
   id!: number;
-  uuid!: string;
-  created_at!: string;
-  updated_at!: string;
+  createdAt!: string;
+  updatedAt!: string;
+
+  QueryBuilderType!: BaseQueryBuilder<this>;
 
   // This register the custom query builder
-  static QueryBuilder = BaseModelQueryBuilder
+  static QueryBuilder = BaseQueryBuilder;
 
-  ;
+  // Modifiers are reusable query snippets that can be used in various places.
+  static modifiers: Modifiers = {
+    orderByCreation(builder) {
+
+      builder.orderBy('createdAt');
+
+    },
+  };
 
   // Omit fields for json response from model
-  $formatJson(instance) {
+  $formatJson(instance: BaseModel): BaseModel {
 
     super.$formatJson(instance);
 
+    // eslint-disable-next-line no-param-reassign
     delete instance.id;
 
     return instance;
@@ -25,9 +34,11 @@ export default class BaseModel extends Model {
   }
 
   // Add an updated value each time a model is updated
-  $beforeUpdate() {
+  async $beforeUpdate(opt, queryContext): Promise<void> {
 
-    this.updated_at = new Date().toISOString();
+    await super.$beforeUpdate(opt, queryContext);
+
+    this.updatedAt = new Date().toISOString();
 
   }
 

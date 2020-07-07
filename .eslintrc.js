@@ -13,7 +13,7 @@ module.exports = {
     'plugin:jest/recommended'
   ],
   plugins: [
-    "@typescript-eslint",
+    "@typescript-eslint"
   ],
   settings: {
     'import/resolver':{
@@ -30,6 +30,11 @@ module.exports = {
     }],
     // Typescript
     "@typescript-eslint/lines-between-class-members": ["warn", {"exceptAfterOverload": true}],
+    "@typescript-eslint/type-annotation-spacing": ["warn", 
+    { "before": false, "after": true, 
+    "overrides": { 
+      "arrow": { "before": true, "after": true },
+      "colon": { "before": false, "after": true } }}],
     // length
     "max-len": [
       "warn",

@@ -22,8 +22,8 @@ export async function up(knex: Knex): Promise<any> {
       table
         .string('password')
         .nullable();
-      table.timestamp('created_at').defaultTo(knex.fn.now());
-      table.timestamp('updated_at').defaultTo(null);
+      table.timestamp('createdAt').defaultTo(knex.fn.now());
+      table.timestamp('updatedAt').defaultTo(null);
 
     })
 
@@ -47,8 +47,8 @@ export async function up(knex: Knex): Promise<any> {
         .index();
       table.dateTime('expiration').nullable();
       table.string('device').nullable();
-      table.timestamp('created_at').defaultTo(knex.fn.now());
-      table.timestamp('updated_at').defaultTo(null);
+      table.timestamp('createdAt').defaultTo(knex.fn.now());
+      table.timestamp('updatedAt').defaultTo(null);
 
     });
 

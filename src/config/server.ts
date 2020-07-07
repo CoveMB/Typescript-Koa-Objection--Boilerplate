@@ -9,7 +9,7 @@ import helmet from 'koa-helmet';
 import { userAgent } from 'koa-useragent';
 import registerRouters from 'api';
 
-const configServer = () => {
+const configServer = (): Koa => {
 
   /**
    * Create app

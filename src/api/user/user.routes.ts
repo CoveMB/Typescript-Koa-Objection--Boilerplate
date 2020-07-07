@@ -1,8 +1,8 @@
-const controller = require('./user.controller');
-const { authenticated, validateRequest } = require('globalMiddlewares');
-const requests = require('./middlewares/user.requests');
-const access = require('./middlewares/user.access');
-const records = require('./middlewares/user.records');
+import { authenticated, validateRequest } from 'globalMiddlewares';
+import * as controller from './user.controller';
+import requests from './middlewares/user.requests';
+import access from './middlewares/user.access';
+import records from './middlewares/user.records';
 
 module.exports = Router => {
 

@@ -1,13 +1,15 @@
-const graphqlHTTP = require('koa-graphql');
-const graphQlSchema  = require('config/graphql');
-const { isDevelopment } = require('config/variables');
-const { ImplementationMissingError } = require('config/errors/error.types');
+import { Context } from 'koa';
+import graphqlHTTP from 'koa-graphql';
+import graphQlSchema from 'config/graphql';
+import { isDevelopment } from 'config/variables';
+import { ImplementationMissingError } from 'config/errors/error.types';
+import { QueryBuilder, Model } from 'objection';
 
 // All graphQL queries are handled by graphqlHTTP
-exports.graphql = async ctx => graphqlHTTP({
+export const graphql = async (ctx: Context): Promise<void> => graphqlHTTP({
   schema     : graphQlSchema,
   graphiql   : isDevelopment, // Will activate graphiql only in during development
-  formatError: error => {
+  formatError: (error: Error) => {
 
     // Throw error from context instead of return in it in the graphQl query result
     ctx.throw(error);
@@ -18,14 +20,14 @@ exports.graphql = async ctx => graphqlHTTP({
   rootValue: {
 
     // This will be trigger for every graphql query
-    async onQuery (query) {
+    async onQuery(query: QueryBuilder<Model>) {
 
       // A query from the graphql endpoint will have a special context
       query.context({
 
         // This will run for every query builder built from the graphql query
         // For the queried entities/model and the related entities as well
-        runBefore (result, builder) {
+        runBefore(result, builder: QueryBuilder<Model>) {
 
           // We get the authenticated user from the context (cf authenticated middleware)
           const { user } = ctx.authenticated;

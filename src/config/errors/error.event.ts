@@ -1,13 +1,14 @@
 import logger from 'config/logger';
-import utils from 'utils';
+import { getFullDate } from 'utils';
 import { sanitizeExposedBody } from 'utils/sanitizer';
+import { Context } from 'koa';
 
 const errorEvent = 'error';
 
-const errorHandler = async(error, ctx) => {
+const errorHandler = async (error: Error, ctx: Context): Promise<void> => {
 
   // Every error are logged
-  logger.error(`${utils.getFullDate()} | context:  ${ctx.method} ${ctx.path} ${sanitizeExposedBody(ctx.request.body)} | ${error.name} | ${error.message} | stack: ${error.stack} | `);
+  logger.error(`${getFullDate()} | context:  ${ctx.method} ${ctx.path} ${sanitizeExposedBody(ctx.request.body)} | ${error.name} | ${error.message} | stack: ${error.stack} | `);
 
 };
 
