@@ -1,7 +1,8 @@
-const { User } = require('models');
-const { validateFoundInstances } = require('models/model.utils');
+import { User } from 'models';
+import { validateFoundInstances } from 'models/model.utils';
+import { Next, Context } from 'koa';
 
-exports.getByIdRecords = async(ctx, next) => {
+export const getByIdRecords = async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 
@@ -28,7 +29,7 @@ exports.getByIdRecords = async(ctx, next) => {
 
 };
 
-exports.getAllRecords = async(ctx, next) => {
+export const getAllRecords = async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 

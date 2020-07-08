@@ -8,7 +8,7 @@ const baseName = path.basename(__filename);
 
 const registerRouters = (app: Koa): Koa => {
 
-  const router: Router = new Router({
+  const router = new Router({
     prefix: `/api/${apiVersion}`,
   });
 

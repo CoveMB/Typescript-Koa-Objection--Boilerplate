@@ -1,21 +1,20 @@
-const jwt = require('jsonwebtoken');
-const { Token } = require('models');
-const { NotAuthenticatedError } = require('config/errors/error.types');
-const { jwtSecret } = require('config/variables');
+import { NotAuthenticatedError } from 'config/errors/error.types';
+import { jwtSecret } from 'config/variables';
+import jwt from 'jsonwebtoken';
+import { Token } from 'models';
+import { Context, Next } from 'koa';
 
-exports.authenticated = async (ctx, next) => {
+const authenticated = async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 
     // Get the bearer token
     const token = ctx.get('Authorization').replace('Bearer ', '');
 
-    let decoded = {};
-
     try {
 
       // Make sure it's valid and get the user id from it
-      decoded = await jwt.verify(token, jwtSecret);
+      await jwt.verify(token, jwtSecret);
 
     } catch {
 
@@ -47,3 +46,5 @@ exports.authenticated = async (ctx, next) => {
   await next();
 
 };
+
+export default authenticated;

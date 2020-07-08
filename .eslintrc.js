@@ -28,6 +28,7 @@ module.exports = {
       js: 'never',
       ts: 'never',
     }],
+    "no-cycle": "off",
     // Typescript
     "@typescript-eslint/lines-between-class-members": ["warn", {"exceptAfterOverload": true}],
     "@typescript-eslint/type-annotation-spacing": ["warn", 

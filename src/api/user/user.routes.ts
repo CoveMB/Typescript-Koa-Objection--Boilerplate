@@ -1,8 +1,8 @@
 import { authenticated, validateRequest } from 'globalMiddlewares';
 import * as controller from './user.controller';
-import requests from './middlewares/user.requests';
-import access from './middlewares/user.access';
-import records from './middlewares/user.records';
+import * as requests from './middlewares/user.requests';
+import * as access from './middlewares/user.access';
+import * as records from './middlewares/user.records';
 
 module.exports = Router => {
 

@@ -1,5 +1,4 @@
-import { Model } from 'objection';
-
+import { ModelClass, Model } from 'objection';
 import { ValidationError, NotFoundError } from 'config/errors/error.types';
 
 const validateInput = (schema, input): void => {
@@ -15,7 +14,7 @@ const validateInput = (schema, input): void => {
 };
 
 const validateFoundInstances = (
-  instancesToCheck: {instance: Model, type: string, search: string | number}[]
+  instancesToCheck: {instance: Model | undefined, type: string, search: string | number}[]
 ): void => {
 
   instancesToCheck.forEach(instanceToCheck => {

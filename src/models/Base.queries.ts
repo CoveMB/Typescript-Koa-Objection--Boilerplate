@@ -8,7 +8,7 @@ export default class BaseQueryBuilder<M extends Model, R = M[]> extends QueryBui
   NumberQueryBuilderType!: BaseQueryBuilder<M, number>;
   PageQueryBuilderType!: BaseQueryBuilder<M, Page<M>>;
 
-  async findOrCreate(data):Promise<this> {
+  async findOrCreate(data): Promise<M> {
 
     // Try to find existing instance
     let instance = await this.findOne(data);
@@ -20,16 +20,14 @@ export default class BaseQueryBuilder<M extends Model, R = M[]> extends QueryBui
 
     }
 
-    return this;
+    return instance;
 
   }
 
-  async findByUuid(uuid: string):Promise<this> {
+  async findByUuid(uuid: string): Promise<M> {
 
     // Try to find existing instance by it's uuid
-    this.findOne({ uuid });
-
-    return this;
+    return this.findOne({ uuid });
 
   }
 

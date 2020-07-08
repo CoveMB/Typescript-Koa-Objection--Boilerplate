@@ -1,6 +1,6 @@
-import { Context } from 'koa';
-import { Token, User } from 'models';
+import { User, Token } from 'models';
 import { sendConfirmationEmail } from 'models/User/Token/token.emails';
+import { Context } from 'koa';
 
 // The user the the parameter comes from the authenticated middleware
 export const getProfile = async (ctx: Context): Promise<void> => {
@@ -120,7 +120,7 @@ export const updateOne = async (ctx: Context): Promise<void> => {
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const deleteOne = async (ctx: Context): Promise<void> => {
+export const deleteOne = async ctx => {
 
   try {
 

@@ -7,7 +7,7 @@ content-type: application/json
 
 {
     "email": "admin@email.com",
-    "password": "isAdmin@2000"
+    "password": "Password@23"
 }
 
 ### Login (one) USER
@@ -17,7 +17,7 @@ content-type: application/json
 
 {
     "email": "user@email.com",
-    "password": "isUser@2000"
+    "password": "Password@23"
 }
 
 ### Logout (one)

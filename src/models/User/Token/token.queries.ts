@@ -2,10 +2,14 @@ import { NotAuthenticatedError, ExpiredTokenError } from 'config/errors/error.ty
 import jwt from 'jsonwebtoken';
 import { jwtSecret } from 'config/variables';
 import BaseQueryBuilder from 'models/Base.queries';
-import { Model, Page } from 'objection';
+import {
+  Model, Page, PartialModelGraph, GraphParameters
+} from 'objection';
+import { ReturnToken } from 'config/types';
 import Token from './Token';
+import User from '../User';
 
-export default class TokenQueryBuilder<M extends (Model | Token), R = M[]>
+export default class TokenQueryBuilder<M extends Model, R = M[]>
   extends BaseQueryBuilder<M, R> {
 
   // These are necessary.
@@ -15,11 +19,11 @@ export default class TokenQueryBuilder<M extends (Model | Token), R = M[]>
   PageQueryBuilderType!: TokenQueryBuilder<M, Page<M>>;
 
   // Validate token, if it exist and if it is not expired than return it with the attached user
-  async tokenWithUserGraphIfValid(token) {
+  async tokenWithUserGraphIfValid(token: string): Promise<Token> {
 
-    const foundToken = await this
+    const foundToken = (await this
       .findOne('token', token)
-      .withGraphFetched('user');
+      .withGraphFetched('user')) as unknown as Token;
 
     if (!foundToken || !foundToken.user) {
 
@@ -42,7 +46,11 @@ export default class TokenQueryBuilder<M extends (Model | Token), R = M[]>
   // Generate an auth token for the user
   // By default the token will be temporary
   // If temporary it will have an expiration date
-  async generateAuthToken(user, { _agent }, temporary) {
+  async generateAuthToken(
+    user: User,
+    { _agent },
+    temporary: boolean
+  ): Promise<ReturnToken> {
 
     const token = await jwt.sign({ id: user.id }, jwtSecret);
 
@@ -65,12 +73,12 @@ export default class TokenQueryBuilder<M extends (Model | Token), R = M[]>
 
     // Insert the token and relate it to the user
     await this.insertGraph(
-      {
+      ({
         token,
         expiration: date,
         device    : `${_agent.os || 'unknown'} - ${_agent.browser || 'unknown'}`,
         user,
-      }, {
+      }) as PartialModelGraph<M, M & GraphParameters>, {
         relate: true
       }
     );
@@ -82,7 +90,7 @@ export default class TokenQueryBuilder<M extends (Model | Token), R = M[]>
   }
 
   // Revoke an auth token from the user
-  async revokeAuthToken(token) {
+  async revokeAuthToken(token: string): Promise<number> {
 
     return this
       .findOne({ token })
@@ -91,7 +99,7 @@ export default class TokenQueryBuilder<M extends (Model | Token), R = M[]>
   }
 
   // Revoke all auth tokens from the user
-  async revokeAllAuthTokens(user) {
+  async revokeAllAuthTokens(user: User): Promise<number> {
 
     return this
       .where({ user_id: user.id })

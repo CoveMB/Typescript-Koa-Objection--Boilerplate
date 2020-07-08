@@ -1,7 +1,7 @@
-const Joi = require('@hapi/joi');
+import Joi from '@hapi/joi';
 
 // Define schema to validate request body
-exports.createUpdateSchema = Joi.object({
+export const createUpdateSchema = Joi.object({
   email: Joi
     .string()
     .email(),

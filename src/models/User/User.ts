@@ -1,37 +1,37 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable no-multi-spaces */
 /* eslint-disable no-param-reassign */
-import BaseModel from 'models/BaseModel';
 import Token from 'models/User/Token/Token';
 import {
   RelationMappings, Modifiers, QueryContext
 } from 'objection';
-import setUpUnique from 'objection-unique';
-import setUpPassword from 'objection-password';
+import Unique from 'objection-unique';
+import Password from 'objection-password';
+import BaseModel from 'models/BaseModel';
 import validateUserInput from './user.validations';
 import UserQueryBuilder from './user.queries';
 
-// This plugin allow for automatic password hashing, if you want to allow an empty password you need to pass it allowEmptyPassword (this way user can register and set their password after validating their email)
-const Password = setUpPassword({
-  allowEmptyPassword: true
-});
-
 // This plugin allow for unique validation on model
-const Unique = setUpUnique({
+@Unique({
+  identifiers: [ 'id' ],
   fields     : [ 'email' ],
-  identifiers: [ 'id' ]
-});
+})
 
-@Unique
-@Password
+// This plugin allow for automatic password hashing, if you want to allow an empty password you need to pass it allowEmptyPassword (this way user can register and set their password after validating their email)
+@Password({
+  allowEmptyPassword: true
+})
 export default class User extends BaseModel {
 
   uuid!: string;
   email!: string;
   password!: string;
   admin!: boolean;
-  verifyPassword!: (password: string) => Promise<User>;
+  verifyPassword: (password: string) => Promise<boolean>;
 
   tokens?: Token[];
 
+  // ModelClassType!: ModelClass<this extends Model>;
   QueryBuilderType!: UserQueryBuilder<this>;
 
   // This register the custom query builder
@@ -107,6 +107,9 @@ export default class User extends BaseModel {
 
   // Modifiers are reusable query snippets that can be used in various places.
   static modifiers: Modifiers = {
+
+    // Get modifiers from base class
+    ...BaseModel.modifiers,
 
     // This modifier control the data that can be accessed depending of the authenticated user
     graphQLAccessControl(builder: UserQueryBuilder<User>, user: User): void {

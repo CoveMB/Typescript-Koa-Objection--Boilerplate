@@ -1,6 +1,7 @@
-const { NotAuthorizeError } = require('config/errors/error.types');
+import { NotAuthorizeError } from 'config/errors/error.types';
+import { Context, Next } from 'koa';
 
-exports.isSelfOrAdmin = async(ctx, next) => {
+export const isSelfOrAdmin = async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 

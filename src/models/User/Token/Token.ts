@@ -1,7 +1,6 @@
 import BaseModel from 'models/BaseModel';
 import User from 'models/User/User';
-import { RelationMappings, Modifiers, Model } from 'objection';
-import BaseQueryBuilder from 'models/Base.queries';
+import { RelationMappings, Modifiers } from 'objection';
 import TokenQueryBuilder from './token.queries';
 
 export default class Token extends BaseModel {
@@ -52,6 +51,9 @@ export default class Token extends BaseModel {
 
   // Modifiers are reusable query snippets that can be used in various places.
   static modifiers: Modifiers = {
+
+    // Get modifiers from base class
+    ...BaseModel.modifiers,
 
     // This modifier control the data that can be accessed depending of the authenticated user
     graphQLAccessControl(builder, user) {

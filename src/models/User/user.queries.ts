@@ -1,14 +1,10 @@
 import { LoginError } from 'config/errors/error.types';
 import BaseQueryBuilder from 'models/Base.queries';
 import { Model, Page } from 'objection';
+import { Credentials } from 'config/types';
 import User from './User';
 
-type Credentials = {
-  email: string,
-  password: string
-};
-
-export default class UserQueryBuilder<M extends Model | User, R = M[]>
+export default class UserQueryBuilder<M extends Model, R = M[]>
   extends BaseQueryBuilder<M, R> {
 
   // These are necessary.
@@ -20,7 +16,7 @@ export default class UserQueryBuilder<M extends Model | User, R = M[]>
   async findByCredentials({ email, password }: Credentials): Promise<User> {
 
     // Find the appropriate user from a the sent credentials (including email and password)
-    const user: User = await this.first().where('email', email);
+    const user = (await this.findOne('email', email)) as unknown as User;
 
     // If no user is found throw login error
     if (!user) {
