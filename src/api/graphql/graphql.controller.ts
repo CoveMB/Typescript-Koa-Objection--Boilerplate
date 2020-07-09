@@ -27,7 +27,7 @@ export const graphql = async (ctx: Context): Promise<void> => graphqlHTTP({
 
         // This will run for every query builder built from the graphql query
         // For the queried entities/model and the related entities as well
-        runBefore(result, builder: QueryBuilder<Model>) {
+        runBefore(_, builder: QueryBuilder<Model>) {
 
           // We get the authenticated user from the context (cf authenticated middleware)
           const { user } = ctx.authenticated;

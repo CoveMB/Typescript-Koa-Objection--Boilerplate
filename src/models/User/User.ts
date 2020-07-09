@@ -3,7 +3,7 @@
 /* eslint-disable no-param-reassign */
 import Token from 'models/User/Token/Token';
 import {
-  RelationMappings, Modifiers, QueryContext
+  RelationMappings, Modifiers, QueryContext, ModelOptions
 } from 'objection';
 import Unique from 'objection-unique';
 import Password from 'objection-password';
@@ -27,11 +27,12 @@ export default class User extends BaseModel {
   email!: string;
   password!: string;
   admin!: boolean;
+
+  // Needed until objection-password add types
   verifyPassword: (password: string) => Promise<boolean>;
 
   tokens?: Token[];
 
-  // ModelClassType!: ModelClass<this extends Model>;
   QueryBuilderType!: UserQueryBuilder<this>;
 
   // This register the custom query builder
@@ -95,7 +96,7 @@ export default class User extends BaseModel {
   }
 
   // This hook triggers before an update
-  async $beforeUpdate(opt, queryContext: QueryContext): Promise<void> {
+  async $beforeUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<void> {
 
     // Validate before password hashing
     validateUserInput(this);

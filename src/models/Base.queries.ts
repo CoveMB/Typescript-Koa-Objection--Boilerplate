@@ -1,4 +1,6 @@
-import { QueryBuilder, Model, Page } from 'objection';
+import {
+  QueryBuilder, Model, Page, PartialModelObject
+} from 'objection';
 
 export default class BaseQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
 
@@ -8,7 +10,7 @@ export default class BaseQueryBuilder<M extends Model, R = M[]> extends QueryBui
   NumberQueryBuilderType!: BaseQueryBuilder<M, number>;
   PageQueryBuilderType!: BaseQueryBuilder<M, Page<M>>;
 
-  async findOrCreate(data): Promise<M> {
+  async findOrCreate(data: PartialModelObject<M>): Promise<M> {
 
     // Try to find existing instance
     let instance = await this.findOne(data);

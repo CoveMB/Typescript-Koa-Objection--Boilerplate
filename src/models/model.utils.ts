@@ -1,20 +1,21 @@
-import { ModelClass, Model } from 'objection';
+import { Model, Expression } from 'objection';
 import { ValidationError, NotFoundError } from 'config/errors/error.types';
+import { StringSchema } from '@hapi/joi';
 
-const validateInput = (schema, input): void => {
+const validateInput = (schema: StringSchema, input: Expression<string>): void => {
 
   const { error } = schema.validate(input);
 
   if (error) {
 
-    throw new ValidationError(error.details.message);
+    throw new ValidationError(JSON.stringify(error.details));
 
   }
 
 };
 
 const validateFoundInstances = (
-  instancesToCheck: {instance: Model | undefined, type: string, search: string | number}[]
+  instancesToCheck: {instance?: Model, type: string, search: string | number}[]
 ): void => {
 
   instancesToCheck.forEach(instanceToCheck => {

@@ -1,9 +1,18 @@
+/* eslint-disable max-classes-per-file */
 // Hidden errors //
+
+import { ValidationErrorItem } from '@hapi/joi';
 
 class ConfigError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated if a configuration fails
-  constructor(message) {
+  constructor(message: string) {
 
     super(`The configuration failed: ${message}`);
     this.name = 'ConfigError';
@@ -16,8 +25,14 @@ class ConfigError extends Error {
 
 class QueryError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated if a query fails
-  constructor(message) {
+  constructor(message: string) {
 
     super(`The query failed: ${message}`);
     this.name = 'QueryError';
@@ -30,8 +45,14 @@ class QueryError extends Error {
 
 class ImplementationMissingError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated if a query fails
-  constructor(message) {
+  constructor(message: string) {
 
     super(`You are missing an implementation: ${message}`);
     this.name = 'ImplementationMissingError';
@@ -44,8 +65,14 @@ class ImplementationMissingError extends Error {
 
 class EmailNotSentError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated if an email could not been sent
-  constructor(message) {
+  constructor(message: string) {
 
     super(`Email could not been sent: ${message}`);
     this.name = 'EmailNotSentError';
@@ -58,8 +85,14 @@ class EmailNotSentError extends Error {
 
 class ThirdPartyError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated if an email could not been sent
-  constructor(message) {
+  constructor(message: string) {
 
     super(`A third party involved in the request could not been reach: ${message}`);
     this.name = 'ThirdPartyError';
@@ -74,8 +107,14 @@ class ThirdPartyError extends Error {
 
 class NotFoundError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated when a record is nopt found in the db
-  constructor(message) {
+  constructor(message: string) {
 
     super(`Not found: ${message}`);
     this.name = 'NotFoundError';
@@ -87,6 +126,12 @@ class NotFoundError extends Error {
 }
 
 class LoginError extends Error {
+
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
 
   // This error is generated when a login failed
   constructor() {
@@ -102,6 +147,12 @@ class LoginError extends Error {
 
 class NotAuthenticatedError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated when the user is performing an action that require authentication but he/she is not
   constructor() {
 
@@ -115,6 +166,12 @@ class NotAuthenticatedError extends Error {
 }
 
 class ExpiredTokenError extends Error {
+
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
 
   // This error is generated when a token sent with the request is expired
   constructor() {
@@ -130,8 +187,14 @@ class ExpiredTokenError extends Error {
 
 class ValidationError extends Error {
 
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
+
   // This error is generated when a validation have failed
-  constructor(message) {
+  constructor(message: string) {
 
     super(`The validation failed: ${message}`);
     this.name = 'ValidationError';
@@ -143,6 +206,12 @@ class ValidationError extends Error {
 }
 
 class NotAuthorizeError extends Error {
+
+  message!: string;
+  name!: string;
+  status!: number;
+  expose!: boolean;
+  stack?: string;
 
   // This error is generated when the user is performing an unauthorized action
   constructor() {
@@ -156,7 +225,7 @@ class NotAuthorizeError extends Error {
 
 }
 
-module.exports = {
+export {
   ExpiredTokenError,
   ValidationError,
   NotFoundError,

@@ -1,6 +1,8 @@
+/* eslint-disable import/no-cycle */
 import BaseModel from 'models/BaseModel';
 import User from 'models/User/User';
-import { RelationMappings, Modifiers } from 'objection';
+import { RelationMappings, Modifiers, Model } from 'objection';
+import BaseQueryBuilder from 'models/Base.queries';
 import TokenQueryBuilder from './token.queries';
 
 export default class Token extends BaseModel {

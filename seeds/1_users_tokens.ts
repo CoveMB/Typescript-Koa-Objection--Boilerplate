@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 // bcrypt is included in the objection-password package
 import bcrypt from 'bcrypt';
 import * as Knex from 'knex';
@@ -9,7 +10,7 @@ const {
 
 const password = bcrypt.hashSync(process.env.INITIAL_PASSWORD, 12);
 
-export async function seed(knex: Knex): Promise<any> {
+export async function seed(knex: Knex): Promise<void> {
 
   // Deletes ALL existing entries
   return knex('user').del()

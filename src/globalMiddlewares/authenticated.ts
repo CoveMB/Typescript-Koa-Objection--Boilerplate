@@ -2,19 +2,19 @@ import { NotAuthenticatedError } from 'config/errors/error.types';
 import { jwtSecret } from 'config/variables';
 import jwt from 'jsonwebtoken';
 import { Token } from 'models';
-import { Context, Next } from 'koa';
+import { Context, Next, ExtendableContext } from 'koa';
 
 const authenticated = async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 
     // Get the bearer token
-    const token = ctx.get('Authorization').replace('Bearer ', '');
+    const token = ctx.get('Authorization').replace('Bearer ', '') as string;
 
     try {
 
       // Make sure it's valid and get the user id from it
-      await jwt.verify(token, jwtSecret);
+      jwt.verify(token, jwtSecret);
 
     } catch {
 

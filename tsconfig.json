@@ -21,7 +21,7 @@
       ]
     },
     "typeRoots": [
-      "./src/config/types",
+      "src/types",
       "node_modules/@types"
     ]
   },

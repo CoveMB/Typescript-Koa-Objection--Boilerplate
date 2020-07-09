@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { NotAuthenticatedError, ExpiredTokenError } from 'config/errors/error.types';
 import jwt from 'jsonwebtoken';
 import { jwtSecret } from 'config/variables';
@@ -5,7 +6,7 @@ import BaseQueryBuilder from 'models/Base.queries';
 import {
   Model, Page, PartialModelGraph, GraphParameters
 } from 'objection';
-import { ReturnToken } from 'config/types';
+import { ReturnToken } from 'types';
 import Token from './Token';
 import User from '../User';
 

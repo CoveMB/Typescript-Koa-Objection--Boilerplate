@@ -1,5 +1,6 @@
 import joi from '@hapi/joi';
 import { ConfigError } from 'config/errors/error.types';
+import { Secret } from 'jsonwebtoken';
 
 /**
  * Generate a validation schema using joi to check the type of your environment variables
@@ -32,7 +33,7 @@ if (error) {
 
 }
 
-export const jwtSecret = envVars.JWT_SECRET;
+export const jwtSecret = envVars.JWT_SECRET as Secret;
 export const sendGridSecret = envVars.SENDGRID_SECRET;
 export const sentryDNS = envVars.SENTRY_DNS;
 export const sentryEnv = envVars.SENTRY_ENVIRONMENT;

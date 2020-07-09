@@ -1,10 +1,18 @@
-const { EmailNotSentError } = require('config/errors/error.types');
-const { errorEvent } = require('config/errors/error.event');
-const { emailFrom, clientUrl } = require('config/variables');
-const sgMail = require('config/emails');
+import { EmailNotSentError } from 'config/errors/error.types';
+import { errorEvent } from 'config/errors/error.event';
+import { emailFrom, clientUrl } from 'config/variables';
+import sgMailClient from 'config/emails';
+import { MailService } from '@sendgrid/mail';
+import { Context } from 'koa';
+import { User } from 'models';
+import { ReturnToken, TokenEmailClient } from 'types';
 
-const sender = emailClient => ({
-  async sendConfirmationEmail(ctx, { email }, { token }) {
+const sender = (emailClient: MailService): TokenEmailClient => ({
+  async sendConfirmationEmail(
+    ctx: Context,
+    { email }: User,
+    { token }: ReturnToken
+  ): Promise<void> {
 
     try {
 
@@ -25,7 +33,11 @@ const sender = emailClient => ({
     }
 
   },
-  async sendResetPasswordEmail(ctx, { email }, { token }) {
+  async sendResetPasswordEmail(
+    ctx: Context,
+    { email }: User,
+    { token }: ReturnToken
+  ): Promise<void> {
 
     try {
 
@@ -48,6 +60,6 @@ const sender = emailClient => ({
   }
 });
 
-const sendEmails = sender(sgMail);
+const { sendConfirmationEmail, sendResetPasswordEmail } = sender(sgMailClient);
 
-module.exports = sendEmails;
+export { sendConfirmationEmail, sendResetPasswordEmail };

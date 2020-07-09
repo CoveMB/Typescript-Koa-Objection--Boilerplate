@@ -1,4 +1,6 @@
-import { Model, Modifiers } from 'objection';
+import {
+  Model, Modifiers, ModelOptions, QueryContext
+} from 'objection';
 import BaseQueryBuilder from './Base.queries';
 
 export default class BaseModel extends Model {
@@ -34,7 +36,7 @@ export default class BaseModel extends Model {
   }
 
   // Add an updated value each time a model is updated
-  async $beforeUpdate(opt, queryContext): Promise<void> {
+  async $beforeUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<void> {
 
     await super.$beforeUpdate(opt, queryContext);
 

@@ -1,8 +1,12 @@
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
 import { Next, Context } from 'koa';
+import { AuthenticatedContextWithParams } from 'types';
 
-export const getByIdRecords = async (ctx: Context, next: Next): Promise<void> => {
+export const getByIdRecords = async (
+  ctx: AuthenticatedContextWithParams,
+  next: Next
+): Promise<void> => {
 
   try {
 
@@ -29,7 +33,10 @@ export const getByIdRecords = async (ctx: Context, next: Next): Promise<void> =>
 
 };
 
-export const getAllRecords = async (ctx: Context, next: Next): Promise<void> => {
+export const getAllRecords =  async (
+  ctx: AuthenticatedContextWithParams,
+  next: Next
+): Promise<void> => {
 
   try {
 

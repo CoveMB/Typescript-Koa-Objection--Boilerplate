@@ -24,7 +24,7 @@ Accept: */*
 content-type: application/json
 
 {
-    "email": "user4@email.com"
+    "email": "user8email.com"
 }
 
 ### POST users (create) Admin

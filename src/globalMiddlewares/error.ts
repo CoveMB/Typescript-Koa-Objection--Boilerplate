@@ -24,7 +24,7 @@ const error = async (ctx: Context, next: Next): Promise<void> => {
         errors: err.data,
 
         // Will construct a message concatenating all the Objection validation errors
-        message: Object.keys(err.data).reduce((acc, validationErrors) => ` ${acc + err.data[validationErrors].reduce((a, validationError) => `${capitalize(validationError.message)}`, '')}`, '')
+        message: Object.keys(err.data).reduce((acc, validationErrors) => ` ${acc + err.data[validationErrors].reduce((_: string, validationError: Record<string, string>) => `${capitalize(validationError.message)}`, '')}`, '')
       };
 
       // Return errors from objection orm

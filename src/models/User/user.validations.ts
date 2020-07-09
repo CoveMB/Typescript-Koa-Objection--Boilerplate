@@ -1,9 +1,12 @@
-const passwordComplexity = require('joi-password-complexity');
-const { ValidationError } = require('config/errors/error.types');
-const Joi = require('@hapi/joi');
-const { validateInput } = require('../model.utils');
+/* eslint-disable import/no-cycle */
+import Joi from '@hapi/joi';
+import { ValidationError } from 'config/errors/error.types';
+import passwordComplexity from 'joi-password-complexity';
+import { PartialModelObject, Expression } from 'objection';
+import { User } from 'models';
+import { validateInput } from '../model.utils';
 
-const passwordValidation = password => {
+const passwordValidation = (password: Expression<string>): void => {
 
   const complexityOptions = {
     min             : 8,
@@ -29,7 +32,7 @@ const passwordValidation = password => {
 
 const emailSchema = Joi.string().email();
 
-const validateUserInput = payload => {
+const validateUserInput = (payload: PartialModelObject<User>): void => {
 
   // Validate the password
   if (payload.password) {
@@ -47,4 +50,4 @@ const validateUserInput = payload => {
 
 };
 
-module.exports = validateUserInput;
+export default validateUserInput;
