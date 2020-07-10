@@ -1,12 +1,12 @@
-import { Context } from 'koa';
 import graphqlHTTP from 'koa-graphql';
 import graphQlSchema from 'config/graphql';
 import { isDevelopment } from 'config/variables';
 import { ImplementationMissingError } from 'config/errors/error.types';
 import { QueryBuilder, Model } from 'objection';
+import { GraphqlWithRequestContext } from 'types';
 
 // All graphQL queries are handled by graphqlHTTP
-export const graphql = async (ctx: Context): Promise<void> => graphqlHTTP({
+export const graphql = async (ctx: GraphqlWithRequestContext): Promise<void> => graphqlHTTP({
   schema     : graphQlSchema,
   graphiql   : isDevelopment, // Will activate graphiql only in during development
   formatError: (error: Error) => {

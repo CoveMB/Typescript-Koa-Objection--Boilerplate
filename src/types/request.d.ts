@@ -14,20 +14,23 @@ export interface AuthenticatedContextWithParams
   requestUuid: string
 }
 
+// GraphQL context
+interface GraphqlWithRequestContext extends Context {
+  validatedRequest: {
+    query: string
+  }
+}
+
 // User context
 interface UserValidatedRequest {
-  validatedRequest: {
+  validatedRequest?: {
     email: string
     password: string
   }
 }
 
-export interface ContextWithUserRecords
-  extends AuthenticatedContextWithParams {
-  validatedRequest?: {
-    email: string
-    password: string
-  }
+export interface UserRecordsAndRequestContext
+  extends AuthenticatedContextWithParams, UserValidatedRequest {
   records: {
     user?: User,
     users?: User[]
