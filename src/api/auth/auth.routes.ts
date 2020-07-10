@@ -1,7 +1,7 @@
-const requests = require('./middlewares/auth.requests');
-const { authenticated, validateRequest } = require('globalMiddlewares');
-const records = require('./middlewares/auth.records');
-const controller = require('./auth.controller');
+import { authenticated, validateRequest } from 'globalMiddlewares';
+import * as requests from './middlewares/auth.requests';
+import * as records from './middlewares/auth.records';
+import * as controller from './auth.controller';
 
 module.exports = Router => {
 

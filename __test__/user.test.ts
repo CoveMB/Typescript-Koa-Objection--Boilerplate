@@ -99,7 +99,7 @@ test('Should not update user if invalid field is sent', async () => {
 
   // A validation error is triggered
   expect(response.status).toBe(422);
-  expect(response.body.error).toBe(new ValidationError().name);
+  expect(response.body.error).toBe(new ValidationError('').name);
 
 });
 

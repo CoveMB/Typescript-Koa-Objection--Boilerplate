@@ -7,6 +7,7 @@ import {
   Model, Page, PartialModelGraph, GraphParameters
 } from 'objection';
 import { ReturnToken } from 'types';
+import UserAgent from 'koa-useragent/dist/lib/useragent';
 import Token from './Token';
 import User from '../User';
 
@@ -49,11 +50,11 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
   // If temporary it will have an expiration date
   async generateAuthToken(
     user: User,
-    { _agent },
-    temporary: boolean
+    { browser, os }: UserAgent,
+    temporary = false
   ): Promise<ReturnToken> {
 
-    const token = await jwt.sign({ id: user.id }, jwtSecret);
+    const token = jwt.sign({ id: user.id }, jwtSecret);
 
     // If the token is temporary it will expire in one hour
     let date = null;
@@ -77,7 +78,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
       ({
         token,
         expiration: date,
-        device    : `${_agent.os || 'unknown'} - ${_agent.browser || 'unknown'}`,
+        device    : `${os || 'unknown'} - ${browser || 'unknown'}`,
         user,
       }) as PartialModelGraph<M, M & GraphParameters>, {
         relate: true

@@ -1,10 +1,12 @@
 import { User, Token } from 'models';
 import { sendConfirmationEmail } from 'models/User/Token/token.emails';
 import { Context } from 'koa';
-import { UserRecordsAndRequestContext } from 'types';
+import { UserRecordsContext, AuthenticatedContext } from 'types';
 
 // The user the the parameter comes from the authenticated middleware
-export const getProfile = async (ctx: UserRecordsAndRequestContext): Promise<void> => {
+export const getProfile = async (
+  ctx: AuthenticatedContext
+): Promise<void> => {
 
   try {
 
@@ -25,7 +27,7 @@ export const getProfile = async (ctx: UserRecordsAndRequestContext): Promise<voi
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const getOne = async (ctx: UserRecordsAndRequestContext): Promise<void> => {
+export const getOne = async (ctx: UserRecordsContext): Promise<void> => {
 
   try {
 
@@ -45,7 +47,7 @@ export const getOne = async (ctx: UserRecordsAndRequestContext): Promise<void> =
 
 };
 
-export const getAll = async (ctx: UserRecordsAndRequestContext): Promise<void> => {
+export const getAll = async (ctx: UserRecordsContext): Promise<void> => {
 
   try {
 
@@ -95,7 +97,7 @@ export const createOne = async (ctx: Context): Promise<void> => {
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const updateOne = async (ctx: UserRecordsAndRequestContext): Promise<void> => {
+export const updateOne = async (ctx: UserRecordsContext): Promise<void> => {
 
   try {
 
@@ -121,7 +123,7 @@ export const updateOne = async (ctx: UserRecordsAndRequestContext): Promise<void
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const deleteOne = async (ctx: UserRecordsAndRequestContext): Promise<void> => {
+export const deleteOne = async (ctx: UserRecordsContext): Promise<void> => {
 
   try {
 

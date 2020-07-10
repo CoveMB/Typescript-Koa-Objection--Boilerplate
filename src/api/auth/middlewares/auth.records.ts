@@ -1,7 +1,12 @@
-const { User } = require('models');
-const { validateFoundInstances } = require('models/model.utils');
+import { User } from 'models';
+import { validateFoundInstances } from 'models/model.utils';
+import { AuthValidatedRequestContext } from 'types';
+import { Next } from 'koa';
 
-exports.loginRecords = async(ctx, next) => {
+export const loginRecords = async (
+  ctx: AuthValidatedRequestContext,
+  next: Next
+): Promise<void> => {
 
   try {
 
@@ -22,7 +27,10 @@ exports.loginRecords = async(ctx, next) => {
 
 };
 
-exports.requestResetPasswordRecords = async(ctx, next) => {
+export const requestResetPasswordRecords = async (
+  ctx: AuthValidatedRequestContext,
+  next: Next
+): Promise<void> => {
 
   try {
 

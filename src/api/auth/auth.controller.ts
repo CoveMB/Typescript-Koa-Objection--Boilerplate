@@ -1,7 +1,12 @@
-const { sendResetPasswordEmail } = require('models/User/Token/token.emails');
-const { Token } = require('models');
+import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
+import { Token } from 'models';
+import { AuthenticatedContext, AuthRecordsAndRequestContext, AuthValidatedRequestContext } from 'types';
+import { Context } from 'koa';
+import { UserAgentContext } from 'koa-useragent';
 
-exports.logIn = async ctx => {
+export const logIn = async (
+  ctx: AuthRecordsAndRequestContext & UserAgentContext
+): Promise<void> => {
 
   try {
 
@@ -26,7 +31,7 @@ exports.logIn = async ctx => {
 };
 
 // The user the the parameter comes back from the authenticated middleware
-exports.logOut = async ctx => {
+export const logOut = async (ctx: AuthValidatedRequestContext): Promise<void> => {
 
   try {
 
@@ -48,7 +53,7 @@ exports.logOut = async ctx => {
 };
 
 // The user the the parameter comes back from the authenticated middleware
-exports.logOutAll = async ctx => {
+export const logOutAll = async (ctx: AuthenticatedContext): Promise<void> => {
 
   try {
 
@@ -70,7 +75,7 @@ exports.logOutAll = async ctx => {
 };
 
 // Check if the token sent is still valid
-exports.checkToken = async ctx => {
+export const checkToken = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -87,7 +92,7 @@ exports.checkToken = async ctx => {
 
 };
 
-exports.requestResetPassword = async ctx => {
+export const requestResetPassword = async (ctx: AuthRecordsAndRequestContext & UserAgentContext): Promise<void> => {
 
   try {
 
@@ -113,7 +118,9 @@ exports.requestResetPassword = async ctx => {
 
 };
 
-exports.setPassword = async ctx => {
+export const setPassword = async (
+  ctx: AuthValidatedRequestContext & AuthenticatedContext & UserAgentContext
+): Promise<void> => {
 
   try {
 
