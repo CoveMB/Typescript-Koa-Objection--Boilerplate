@@ -24,7 +24,7 @@ const getUserData = (): TestUser => ({
 });
 
 const getFreshToken = async (request: SuperTest<Test>): Promise<{
-  user: User, token: string
+  user: User, token: string | undefined
 }> => {
 
   const { credentials } = getUserData();
@@ -37,8 +37,16 @@ const getFreshToken = async (request: SuperTest<Test>): Promise<{
     .findOne({ email: credentials.email })
     .withGraphFetched('tokens(orderByCreation)');
 
+  let tokenToReturn;
+
+  if (user.tokens) {
+
+    tokenToReturn = user.tokens[0].token;
+
+  }
+
   return {
-    user, token: user.tokens[0].token
+    user, token: tokenToReturn
   };
 
 };

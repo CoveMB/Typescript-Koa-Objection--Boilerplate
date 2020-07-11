@@ -55,13 +55,11 @@ test('Should generate fresh valid 6 month token on logging', async () => {
   // Mutate now to be 6 month from now
   now.setMonth(now.getMonth() + 6);
 
-  const tokenExpiration = new Date(token.expiration);
-
   // The right token is return
   expect(response.body.token.token).toBe(token.token);
 
   //  Should be more than 6 mont valid
-  expect(tokenExpiration.getMonth()).toBe(now.getMonth());
+  expect(token.expiration.getMonth()).toBe(now.getMonth());
 
 });
 
@@ -181,7 +179,7 @@ test('Should revoke all tokens', async () => {
   expect(logoutResponse.status).toBe(200);
 
   // The user does not have any more token
-  expect(dbUser.tokens.length).toBe(0);
+  expect(dbUser.tokens ? dbUser.tokens.length : undefined).toBe(0);
 
 });
 
@@ -250,7 +248,7 @@ test('Should request a password reset generating a temporary 1h valid token', as
   // Mutate now to be 1 hour from now
   now.setHours(now.getHours() + 1);
 
-  const tokenExpiration = new Date(userDb.tokens[0].expiration);
+  const expirationHour = userDb.tokens ? userDb.tokens[0].expiration.getHours() : undefined;
 
   expect(response.status).toBe(200);
 
@@ -258,7 +256,7 @@ test('Should request a password reset generating a temporary 1h valid token', as
   expect(response.body.token).toBeUndefined();
 
   // The expiration date should be in an hour
-  expect(tokenExpiration.getHours()).toBeLessThanOrEqual(now.getHours());
+  expect(expirationHour).toBeLessThanOrEqual(now.getHours());
 
 });
 
@@ -278,13 +276,15 @@ test('Should reset the password of user and make it unable to log with old passw
     .findOne({ email })
     .withGraphFetched('tokens(orderByCreation)');
 
+  const token = userDb.tokens ? userDb.tokens[0].token : undefined;
+
   // Actually reset the password with last token of the user
   const response = await request
     .post('/api/v1/set-password')
     .send({
       password: `${password}2`
     })
-    .set('Authorization', `Bearer ${userDb.tokens[0].token}`);
+    .set('Authorization', `Bearer ${token}`);
 
   // Try login with old password
   const responseOldPassword = await request
@@ -332,13 +332,15 @@ test('Should reset the password and generate a fresh token and revoke all other 
     .findOne({ email })
     .withGraphFetched('tokens(orderByCreation)');
 
+  const token = userDb.tokens ? userDb.tokens[0].token : undefined;
+
   // Actually reset the password with last token of the user
   const response = await request
     .post('/api/v1/set-password')
     .send({
       password: `${password}3`
     })
-    .set('Authorization', `Bearer ${userDb.tokens[0].token}`);
+    .set('Authorization', `Bearer ${token}`);
 
   // Query the user and it's tokens by order of creation
   const userDbAfterReset = await User.query()
@@ -351,16 +353,22 @@ test('Should reset the password and generate a fresh token and revoke all other 
   // Mutate now to be 6 month from now
   now.setMonth(now.getMonth() + 6);
 
-  // Get the expiration date of last generated token
-  const tokenExpiration = new Date(userDbAfterReset.tokens[0].expiration);
+  const userTokenExpiration = userDbAfterReset.tokens
+    ? userDbAfterReset.tokens[0].expiration.getMonth() : undefined;
+
+  const userTokenToken = userDbAfterReset.tokens
+    ? userDbAfterReset.tokens[0].token : undefined;
+
+  const bnTokens = userDbAfterReset.tokens
+    ? userDbAfterReset.tokens.length : undefined;
 
   // The body should contains the new token
-  expect(response.body.token.token).toBe(userDbAfterReset.tokens[0].token);
+  expect(response.body.token.token).toBe(userTokenToken);
 
   // The new token should be 6 month valid
-  expect(tokenExpiration.getMonth()).toBe(now.getMonth());
+  expect(userTokenExpiration).toBe(now.getMonth());
 
   // All other tokens should has been revoked
-  expect(userDbAfterReset.tokens.length).toBe(1);
+  expect(bnTokens).toBe(1);
 
 });

@@ -27,9 +27,11 @@ test('Should sign up new user, sending new token by email', async () => {
     .findOne({ email: newUser.email })
     .withGraphFetched('tokens(orderByCreation)');
 
+  const tokenExpiration = newUserDB.tokens ? newUserDB.tokens[0].expiration.getHours() : undefined;
+  const numberOfTokens = newUserDB.tokens ? newUserDB.tokens.length : undefined;
+
   // Get the expiration date of last generated token
   const now = new Date();
-  const tokenExpiration = new Date(newUserDB.tokens[0].expiration);
 
   expect(response.status).toBe(201);
   expect(response.body).toEqual({ status: 'success' });
@@ -38,10 +40,10 @@ test('Should sign up new user, sending new token by email', async () => {
   expect(newUserDB).not.toBeUndefined();
 
   // The newt user should have one new token
-  expect(newUserDB.tokens.length).toBe(1);
+  expect(numberOfTokens).toBe(1);
 
   // The expiration date of new token should be in an hour
-  expect(tokenExpiration.getHours()).toBeLessThanOrEqual(now.getHours() + 1);
+  expect(tokenExpiration).toBeLessThanOrEqual(now.getHours() + 1);
 
 });
 
@@ -63,13 +65,15 @@ test('Should update user', async () => {
     .findOne({ email: newUser.email })
     .withGraphFetched('tokens(orderByCreation)');
 
+  const token = tokens ? tokens[0].token : '';
+
   // Request a user update with the fresh token
   const response = await request
     .patch(`/api/v1/users/${uuid}`)
     .send({
       email: `changed${email}`
     })
-    .set('Authorization', `Bearer ${tokens[0].token}`);
+    .set('Authorization', `Bearer ${token}`);
 
   // Query the updated user
   const updatedUser = await User.query()
@@ -119,10 +123,12 @@ test('Should delete user', async () => {
     .findOne({ email: newUser.email })
     .withGraphFetched('tokens(orderByCreation)');
 
+  const token = tokens ? tokens[0].token : undefined;
+
   // Request user delete
   const response = await request
     .delete(`/api/v1/users/${uuid}`)
-    .set('Authorization', `Bearer ${tokens[0].token}`);
+    .set('Authorization', `Bearer ${token}`);
 
   // Query user
   const deletedUser = await User.query()
