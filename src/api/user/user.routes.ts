@@ -1,10 +1,12 @@
 import { authenticated, validateRequest } from 'globalMiddlewares';
+import KoaRouter from 'koa-router';
+import { Constructable } from 'types/global';
 import * as controller from './user.controller';
 import * as requests from './middlewares/user.requests';
 import * as access from './middlewares/user.access';
 import * as records from './middlewares/user.records';
 
-module.exports = Router => {
+module.exports = (Router: Constructable<KoaRouter>) => {
 
   const router = new Router({
     prefix: '/users',
@@ -32,12 +34,12 @@ module.exports = Router => {
     )
     .post(
       '/',
-      validateRequest(requests.createUpdateSchema, 'body'),
+      requests.createUpdateSchema,
       controller.createOne
     )
     .patch(
       '/:uuid',
-      validateRequest(requests.createUpdateSchema, 'body'),
+      requests.createUpdateSchema,
       authenticated,
       access.isSelfOrAdmin,
       records.getByIdRecords,

@@ -1,4 +1,15 @@
-const { User } = require('models');
+import { User } from 'models';
+import { SuperTest, Test } from 'supertest';
+
+type TestUser = {
+  credentials: {
+    email: string,
+    password: string
+  },
+  id: number,
+  email: string,
+  password: string
+};
 
 const testUser = {
   credentials: {
@@ -8,11 +19,13 @@ const testUser = {
   id: 3,
 };
 
-const getUserData = () => ({
+const getUserData = (): TestUser => ({
   ...testUser, ...testUser.credentials
 });
 
-const getFreshToken = async request => {
+const getFreshToken = async (request: SuperTest<Test>): Promise<{
+  user: User, token: string
+}> => {
 
   const { credentials } = getUserData();
 
@@ -30,7 +43,7 @@ const getFreshToken = async request => {
 
 };
 
-module.exports = {
+export {
   getFreshToken,
   getUserData
 };

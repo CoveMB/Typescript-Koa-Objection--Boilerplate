@@ -1,4 +1,6 @@
-const countInstances = async model => {
+import { Model } from 'objection';
+
+const countInstances = async (model: any): Promise<number> => {
 
   const dbCount = await model.query().count();
 
@@ -6,6 +8,6 @@ const countInstances = async model => {
 
 };
 
-module.exports = {
+export {
   countInstances
 };

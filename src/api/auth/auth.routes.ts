@@ -1,28 +1,30 @@
 import { authenticated, validateRequest } from 'globalMiddlewares';
+import KoaRouter from 'koa-router';
+import { Constructable } from 'types/global';
 import * as requests from './middlewares/auth.requests';
 import * as records from './middlewares/auth.records';
 import * as controller from './auth.controller';
 
-module.exports = Router => {
+module.exports = (Router: Constructable<KoaRouter>) => {
 
   const router = new Router();
 
   router
     .post(
       '/login',
-      validateRequest(requests.loginSchema, 'body'),
+      requests.loginSchema,
       records.loginRecords,
       controller.logIn
     )
     .post(
       '/logout',
-      validateRequest(requests.logoutSchema, 'body'),
+      requests.logoutSchema,
       authenticated,
       controller.logOut
     )
     .post(
-      '/logoutAll',
-      validateRequest(requests.logoutAllSchema, 'body'),
+      '/logout-all',
+      requests.logoutAllSchema,
       authenticated,
       controller.logOutAll
     )
@@ -33,13 +35,13 @@ module.exports = Router => {
     )
     .post(
       '/request-password-reset',
-      validateRequest(requests.requestResetPasswordSchema, 'body'),
+      requests.requestResetPasswordSchema,
       records.requestResetPasswordRecords,
       controller.requestResetPassword
     )
     .post(
       '/set-password',
-      validateRequest(requests.setPasswordSchema, 'body'),
+      requests.setPasswordSchema,
       authenticated,
       controller.setPassword
     );

@@ -1,10 +1,10 @@
 import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
 import { Token } from 'models';
 import { AuthenticatedContext, AuthRecordsAndRequestContext, AuthValidatedRequestContext } from 'types';
-import { Context } from 'koa';
+import { Context, Middleware } from 'koa';
 import { UserAgentContext } from 'koa-useragent';
 
-export const logIn = async (
+export const logIn: Middleware = async (
   ctx: AuthRecordsAndRequestContext & UserAgentContext
 ): Promise<void> => {
 
@@ -31,7 +31,7 @@ export const logIn = async (
 };
 
 // The user the the parameter comes back from the authenticated middleware
-export const logOut = async (ctx: AuthValidatedRequestContext): Promise<void> => {
+export const logOut: Middleware = async (ctx: AuthValidatedRequestContext): Promise<void> => {
 
   try {
 
@@ -53,7 +53,7 @@ export const logOut = async (ctx: AuthValidatedRequestContext): Promise<void> =>
 };
 
 // The user the the parameter comes back from the authenticated middleware
-export const logOutAll = async (ctx: AuthenticatedContext): Promise<void> => {
+export const logOutAll: Middleware = async (ctx: AuthenticatedContext): Promise<void> => {
 
   try {
 
@@ -75,7 +75,7 @@ export const logOutAll = async (ctx: AuthenticatedContext): Promise<void> => {
 };
 
 // Check if the token sent is still valid
-export const checkToken = async (ctx: Context): Promise<void> => {
+export const checkToken: Middleware = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -92,7 +92,9 @@ export const checkToken = async (ctx: Context): Promise<void> => {
 
 };
 
-export const requestResetPassword = async (ctx: AuthRecordsAndRequestContext & UserAgentContext): Promise<void> => {
+export const requestResetPassword: Middleware = async (
+  ctx: AuthRecordsAndRequestContext & UserAgentContext
+): Promise<void> => {
 
   try {
 
@@ -118,7 +120,7 @@ export const requestResetPassword = async (ctx: AuthRecordsAndRequestContext & U
 
 };
 
-export const setPassword = async (
+export const setPassword: Middleware = async (
   ctx: AuthValidatedRequestContext & AuthenticatedContext & UserAgentContext
 ): Promise<void> => {
 

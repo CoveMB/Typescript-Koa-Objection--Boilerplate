@@ -32,7 +32,7 @@ Authorization: Bearer {{ $dotenv USER_TOKEN }}
 
 
 ### Logout (all)
-POST {{baseUrl}}/{{version}}/logoutAll
+POST {{baseUrl}}/{{version}}/logout-all
 Accept: */*
 content-type: application/json
 Authorization: Bearer {{ $dotenv USER_TOKEN }}

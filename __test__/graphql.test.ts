@@ -103,7 +103,9 @@ test('Should only be able to query data related to authenticated user', async ()
   const responseData = response.body.data;
 
   // Make sure all the tokens return are only from the authenticated user
-  const allTokenAreFromAuthenticatedUser = responseData.tokens.every(tokenFromGraphQl => tokenFromGraphQl.user.email === user.email);
+  const allTokenAreFromAuthenticatedUser = responseData.tokens.every(
+    (tokenFromGraphQl: {user: {email: string}}) => tokenFromGraphQl.user.email === user.email
+  );
 
   expect(responseData.users.length).toBe(1);
   expect(responseData.users[0].email).toBe(user.email);

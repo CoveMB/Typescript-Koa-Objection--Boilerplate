@@ -4,9 +4,13 @@ import { isDevelopment } from 'config/variables';
 import { ImplementationMissingError } from 'config/errors/error.types';
 import { QueryBuilder, Model } from 'objection';
 import { GraphqlWithRequestContext } from 'types';
+import { Middleware, Next } from 'koa';
 
 // All graphQL queries are handled by graphqlHTTP
-export const graphql = async (ctx: GraphqlWithRequestContext): Promise<void> => graphqlHTTP({
+export const graphql: Middleware = async (
+  ctx: GraphqlWithRequestContext,
+  next: Next
+): Promise<void> => graphqlHTTP({
   schema     : graphQlSchema,
   graphiql   : isDevelopment, // Will activate graphiql only in during development
   formatError: (error: Error) => {
@@ -27,7 +31,7 @@ export const graphql = async (ctx: GraphqlWithRequestContext): Promise<void> => 
 
         // This will run for every query builder built from the graphql query
         // For the queried entities/model and the related entities as well
-        runBefore(_, builder: QueryBuilder<Model>) {
+        runBefore(_: Model | Model[], builder: QueryBuilder<Model>) {
 
           // We get the authenticated user from the context (cf authenticated middleware)
           const { user } = ctx.authenticated;
@@ -50,4 +54,4 @@ export const graphql = async (ctx: GraphqlWithRequestContext): Promise<void> => 
 
     }
   }
-})(ctx);
+})(ctx, next);

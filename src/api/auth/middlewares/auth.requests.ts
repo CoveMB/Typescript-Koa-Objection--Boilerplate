@@ -1,6 +1,7 @@
 import Joi from '@hapi/joi';
+import { validateRequest } from 'globalMiddlewares';
 
-export const loginSchema = Joi.object({
+export const loginSchema = validateRequest(Joi.object({
   email: Joi
     .string()
     .email()
@@ -8,26 +9,26 @@ export const loginSchema = Joi.object({
   password: Joi
     .string()
     .required()
-});
+}));
 
-export const logoutSchema = Joi.object({
+export const logoutSchema = validateRequest(Joi.object({
   token: Joi
     .string()
     .required()
-});
+}));
 
-export const logoutAllSchema = Joi.object({
-});
+export const logoutAllSchema = validateRequest(Joi.object({
+}));
 
-export const setPasswordSchema = Joi.object({
+export const setPasswordSchema = validateRequest(Joi.object({
   password: Joi
     .string()
     .required()
-});
+}));
 
-export const requestResetPasswordSchema = Joi.object({
+export const requestResetPasswordSchema = validateRequest(Joi.object({
   email: Joi
     .string()
     .email()
     .required()
-});
+}));

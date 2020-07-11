@@ -1,15 +1,14 @@
 import { ValidationError } from 'config/errors/error.types';
-import { Context, Next } from 'koa';
+import { Context, Next, Middleware } from 'koa';
 import { ObjectSchema } from '@hapi/joi';
 
 const validateRequest = (
-  schema: ObjectSchema,
-  property: string
-) => async (ctx: Context, next: Next): Promise<void> => {
+  schema: ObjectSchema
+): Middleware => async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 
-    const toValidate = ctx.request[property];
+    const toValidate = ctx.request.body;
 
     await schema.validateAsync(toValidate);
 

@@ -80,7 +80,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
         expiration: date,
         device    : `${os || 'unknown'} - ${browser || 'unknown'}`,
         user,
-      }) as PartialModelGraph<M, M & GraphParameters>, {
+      }) as unknown as PartialModelGraph<M, M & GraphParameters>, {
         relate: true
       }
     );

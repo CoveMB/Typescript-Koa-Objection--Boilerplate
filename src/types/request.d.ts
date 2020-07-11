@@ -1,4 +1,4 @@
-import { Context } from 'koa';
+import { Context, ParameterizedContext } from 'koa';
 import { User } from 'models';
 
 export interface AuthenticatedContext
@@ -47,8 +47,8 @@ interface AuthValidatedRequestContext
 }
 
 export interface AuthRecordsAndRequestContext
-  extends Context {
-  records: {
+  extends ParameterizedContext {
+  records?: {
     user?: User
   }
 }

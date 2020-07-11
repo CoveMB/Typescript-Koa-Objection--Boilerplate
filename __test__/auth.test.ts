@@ -170,7 +170,7 @@ test('Should revoke all tokens', async () => {
 
   // Request logout all
   const logoutResponse = await request
-    .post('/api/v1/logoutAll')
+    .post('/api/v1/logout-all')
     .set('Authorization', `Bearer ${token}`);
 
   // Query the user

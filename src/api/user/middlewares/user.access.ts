@@ -1,8 +1,11 @@
 import { NotAuthorizeError } from 'config/errors/error.types';
-import { Next } from 'koa';
+import { Next, Middleware } from 'koa';
 import { AuthenticatedContext } from 'types';
 
-export const isSelfOrAdmin = async (ctx: AuthenticatedContext, next: Next): Promise<void> => {
+export const isSelfOrAdmin: Middleware = async (
+  ctx: AuthenticatedContext,
+  next: Next
+): Promise<void> => {
 
   try {
 

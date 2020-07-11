@@ -1,9 +1,9 @@
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
-import { Next } from 'koa';
+import { Next, Middleware } from 'koa';
 import { AuthenticatedContextWithUuid } from 'types';
 
-export const getByIdRecords = async (
+export const getByIdRecords: Middleware = async (
   ctx: AuthenticatedContextWithUuid,
   next: Next
 ): Promise<void> => {
@@ -33,7 +33,7 @@ export const getByIdRecords = async (
 
 };
 
-export const getAllRecords =  async (
+export const getAllRecords: Middleware =  async (
   ctx: AuthenticatedContextWithUuid,
   next: Next
 ): Promise<void> => {

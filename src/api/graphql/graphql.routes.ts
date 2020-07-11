@@ -1,8 +1,10 @@
-import { authenticated, validateRequest } from 'globalMiddlewares';
+import { authenticated } from 'globalMiddlewares';
+import KoaRouter from 'koa-router';
+import { Constructable } from 'types/global';
 import * as requests from './middlewares/graphql.requests';
 import * as controller from './graphql.controller';
 
-module.exports = Router => {
+module.exports = (Router: Constructable<KoaRouter>) => {
 
   const router = new Router({
     prefix: '/graphql',
@@ -11,7 +13,7 @@ module.exports = Router => {
   router
     .post(
       '/',
-      validateRequest(requests.query, 'body'),
+      requests.query,
       authenticated,
       controller.graphql
     );

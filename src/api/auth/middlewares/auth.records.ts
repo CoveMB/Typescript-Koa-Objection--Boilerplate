@@ -1,9 +1,9 @@
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
 import { AuthValidatedRequestContext } from 'types';
-import { Next } from 'koa';
+import { Next, Middleware } from 'koa';
 
-export const loginRecords = async (
+export const loginRecords: Middleware = async (
   ctx: AuthValidatedRequestContext,
   next: Next
 ): Promise<void> => {
@@ -27,7 +27,7 @@ export const loginRecords = async (
 
 };
 
-export const requestResetPasswordRecords = async (
+export const requestResetPasswordRecords: Middleware = async (
   ctx: AuthValidatedRequestContext,
   next: Next
 ): Promise<void> => {

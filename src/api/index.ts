@@ -17,7 +17,7 @@ const registerRouters = (app: Koa): Koa => {
     .filter(file => file.indexOf('.') !== 0 && file !== baseName)
     .forEach(file => {
 
-      const api: Router = require(path.join(__dirname, file))(Router); // eslint-disable-line
+      const api = require(path.join(__dirname, file))(Router); // eslint-disable-line
 
       router.use(api.routes());
 
