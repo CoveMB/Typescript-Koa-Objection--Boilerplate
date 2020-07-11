@@ -1,5 +1,5 @@
 import { NotAuthorizeError } from 'config/errors/error.types';
-import { Next, Middleware } from 'koa';
+import { Next } from 'koa';
 import { AuthenticatedContext } from 'types';
 
 export const isSelfOrAdmin  = async (

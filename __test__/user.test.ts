@@ -27,8 +27,11 @@ test('Should sign up new user, sending new token by email', async () => {
     .findOne({ email: newUser.email })
     .withGraphFetched('tokens(orderByCreation)');
 
-  const tokenExpiration = newUserDB.tokens ? newUserDB.tokens[0].expiration.getHours() : undefined;
-  const numberOfTokens = newUserDB.tokens ? newUserDB.tokens.length : undefined;
+  const tokenExpiration = newUserDB.tokens
+    ? newUserDB.tokens[0].expiration.getHours() : undefined;
+
+  const numberOfTokens = newUserDB.tokens
+    ? newUserDB.tokens.length : undefined;
 
   // Get the expiration date of last generated token
   const now = new Date();

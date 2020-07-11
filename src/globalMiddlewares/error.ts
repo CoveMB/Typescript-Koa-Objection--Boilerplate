@@ -1,9 +1,9 @@
 import { errorEvent } from 'config/errors/error.event';
 import { ForeignKeyViolationError, ValidationError } from 'objection';
 import { capitalize } from 'utils';
-import { Next, Context, Middleware } from 'koa';
+import { Next, Context } from 'koa';
 
-const error: Middleware = async (ctx: Context, next: Next): Promise<void> => {
+const error = async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 

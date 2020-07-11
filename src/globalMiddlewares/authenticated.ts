@@ -2,9 +2,9 @@ import { NotAuthenticatedError } from 'config/errors/error.types';
 import { jwtSecret } from 'config/variables';
 import jwt from 'jsonwebtoken';
 import { Token } from 'models';
-import { Context, Next, Middleware } from 'koa';
+import { Context, Next } from 'koa';
 
-const authenticated: Middleware = async (ctx: Context, next: Next): Promise<void> => {
+const authenticated = async (ctx: Context, next: Next): Promise<void> => {
 
   try {
 

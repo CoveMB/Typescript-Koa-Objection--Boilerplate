@@ -21,34 +21,34 @@ module.exports = (Router: Constructable<KoaRouter>) => {
     )
     .get(
       '/:uuid',
-      authenticated,
+      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getByIdRecords as Middleware,
       controller.getOne as unknown as Middleware
     )
     .get(
       '/',
-      authenticated,
+      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getAllRecords as Middleware,
       controller.getAll as unknown as Middleware
     )
     .post(
       '/',
-      requests.createUpdateSchema,
+      requests.createUpdateSchema as Middleware,
       controller.createOne as Middleware
     )
     .patch(
       '/:uuid',
-      requests.createUpdateSchema,
-      authenticated,
+      requests.createUpdateSchema as Middleware,
+      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getByIdRecords as Middleware,
       controller.updateOne as unknown as Middleware
     )
     .delete(
       '/:uuid',
-      authenticated,
+      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getByIdRecords as Middleware,
       controller.deleteOne as unknown as Middleware

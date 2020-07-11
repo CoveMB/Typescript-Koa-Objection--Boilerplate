@@ -6,6 +6,8 @@ import * as requests from './middlewares/auth.requests';
 import * as records from './middlewares/auth.records';
 import * as controller from './auth.controller';
 
+// as unknown is needed because of the missing next paramter in controller
+
 module.exports = (Router: Constructable<KoaRouter>) => {
 
   const router = new Router();
@@ -31,7 +33,7 @@ module.exports = (Router: Constructable<KoaRouter>) => {
     )
     .post(
       '/check-token',
-      authenticated,
+      authenticated as Middleware,
       controller.checkToken as Middleware
     )
     .post(
@@ -42,8 +44,8 @@ module.exports = (Router: Constructable<KoaRouter>) => {
     )
     .post(
       '/set-password',
-      requests.setPasswordSchema,
-      authenticated,
+      requests.setPasswordSchema as Middleware,
+      authenticated as Middleware,
       controller.setPassword as unknown as Middleware
     );
 

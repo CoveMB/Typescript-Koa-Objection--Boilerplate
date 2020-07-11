@@ -14,8 +14,8 @@ module.exports = (Router: Constructable<KoaRouter>) => {
   router
     .post(
       '/',
-      requests.query,
-      authenticated,
+      requests.query as Middleware,
+      authenticated as Middleware,
       controller.graphql as Middleware
     );
 

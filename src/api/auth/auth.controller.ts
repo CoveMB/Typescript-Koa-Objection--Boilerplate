@@ -1,9 +1,6 @@
 import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
 import { Token } from 'models';
-
-import {
-  Context, Middleware, DefaultState
-} from 'koa';
+import { Context } from 'koa';
 import { UserAgentContext } from 'koa-useragent';
 import { AuthRecords, AuthValidatedRequest, AuthenticatedContext } from 'types';
 
