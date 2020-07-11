@@ -1,10 +1,10 @@
 import { User, Token } from 'models';
 import { sendConfirmationEmail } from 'models/User/Token/token.emails';
-import { Context, Middleware } from 'koa';
-import { UserRecordsContext, AuthenticatedContext } from 'types';
+import { Context } from 'koa';
+import { AuthenticatedContext, UserValidatedRequest, UserRecords } from 'types';
 
 // The user the the parameter comes from the authenticated middleware
-export const getProfile: Middleware = async (
+export const getProfile = async (
   ctx: AuthenticatedContext
 ): Promise<void> => {
 
@@ -27,7 +27,9 @@ export const getProfile: Middleware = async (
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const getOne: Middleware = async (ctx: UserRecordsContext): Promise<void> => {
+export const getOne = async (
+  ctx: Context & UserRecords
+): Promise<void> => {
 
   try {
 
@@ -47,7 +49,9 @@ export const getOne: Middleware = async (ctx: UserRecordsContext): Promise<void>
 
 };
 
-export const getAll: Middleware = async (ctx: UserRecordsContext): Promise<void> => {
+export const getAll = async (
+  ctx: Context & UserRecords
+): Promise<void> => {
 
   try {
 
@@ -66,7 +70,7 @@ export const getAll: Middleware = async (ctx: UserRecordsContext): Promise<void>
 
 };
 
-export const createOne: Middleware = async (ctx: Context): Promise<void> => {
+export const createOne = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -97,7 +101,9 @@ export const createOne: Middleware = async (ctx: Context): Promise<void> => {
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const updateOne: Middleware = async (ctx: UserRecordsContext): Promise<void> => {
+export const updateOne = async (
+  ctx: Context & UserRecords & UserValidatedRequest
+): Promise<void> => {
 
   try {
 
@@ -123,7 +129,9 @@ export const updateOne: Middleware = async (ctx: UserRecordsContext): Promise<vo
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const deleteOne: Middleware = async (ctx: UserRecordsContext): Promise<void> => {
+export const deleteOne = async (
+  ctx: Context & UserRecords
+): Promise<void> => {
 
   try {
 

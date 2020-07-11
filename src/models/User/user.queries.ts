@@ -26,7 +26,14 @@ export default class UserQueryBuilder<M extends Model, R = M[]>
 
     }
 
-    const authenticated = await user.verifyPassword(password);
+    let authenticated;
+
+    // This guard is needed until objection-password add types
+    if (user.verifyPassword) {
+
+      authenticated = await user.verifyPassword(password);
+
+    }
 
     // If the password could not be validated throw login error
     if (!authenticated) {

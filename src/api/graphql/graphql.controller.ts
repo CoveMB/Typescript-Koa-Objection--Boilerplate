@@ -3,12 +3,12 @@ import graphQlSchema from 'config/graphql';
 import { isDevelopment } from 'config/variables';
 import { ImplementationMissingError } from 'config/errors/error.types';
 import { QueryBuilder, Model } from 'objection';
-import { GraphqlWithRequestContext } from 'types';
-import { Middleware, Next } from 'koa';
+import { GraphqlWithRequest, AuthenticatedContext } from 'types';
+import { Next } from 'koa';
 
 // All graphQL queries are handled by graphqlHTTP
-export const graphql: Middleware = async (
-  ctx: GraphqlWithRequestContext,
+export const graphql = async (
+  ctx: AuthenticatedContext & GraphqlWithRequest,
   next: Next
 ): Promise<void> => graphqlHTTP({
   schema     : graphQlSchema,

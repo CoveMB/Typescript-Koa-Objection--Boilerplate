@@ -1,6 +1,7 @@
-import { authenticated, validateRequest } from 'globalMiddlewares';
+import { authenticated } from 'globalMiddlewares';
 import KoaRouter from 'koa-router';
 import { Constructable } from 'types/global';
+import { Middleware } from 'koa';
 import * as requests from './middlewares/auth.requests';
 import * as records from './middlewares/auth.records';
 import * as controller from './auth.controller';
@@ -12,38 +13,38 @@ module.exports = (Router: Constructable<KoaRouter>) => {
   router
     .post(
       '/login',
-      requests.loginSchema,
-      records.loginRecords,
-      controller.logIn
+      requests.loginSchema as Middleware,
+      records.loginRecords as Middleware,
+      controller.logIn as unknown as Middleware
     )
     .post(
       '/logout',
-      requests.logoutSchema,
-      authenticated,
-      controller.logOut
+      requests.logoutSchema as Middleware,
+      authenticated as Middleware,
+      controller.logOut as unknown as Middleware
     )
     .post(
       '/logout-all',
-      requests.logoutAllSchema,
-      authenticated,
-      controller.logOutAll
+      requests.logoutAllSchema as Middleware,
+      authenticated as Middleware,
+      controller.logOutAll as unknown as Middleware
     )
     .post(
       '/check-token',
       authenticated,
-      controller.checkToken
+      controller.checkToken as Middleware
     )
     .post(
       '/request-password-reset',
-      requests.requestResetPasswordSchema,
-      records.requestResetPasswordRecords,
-      controller.requestResetPassword
+      requests.requestResetPasswordSchema as Middleware,
+      records.requestResetPasswordRecords as Middleware,
+      controller.requestResetPassword as unknown as Middleware
     )
     .post(
       '/set-password',
       requests.setPasswordSchema,
       authenticated,
-      controller.setPassword
+      controller.setPassword as unknown as Middleware
     );
 
   return router;

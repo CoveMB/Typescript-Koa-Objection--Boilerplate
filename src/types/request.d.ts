@@ -1,7 +1,7 @@
-import { Context, ParameterizedContext } from 'koa';
+import { Context } from 'koa';
 import { User } from 'models';
 
-export interface AuthenticatedContext
+interface AuthenticatedContext
   extends Context {
   authenticated: {
     user: User,
@@ -9,46 +9,43 @@ export interface AuthenticatedContext
   }
 }
 
-export interface AuthenticatedContextWithUuid
-  extends AuthenticatedContext {
+type RequestWithUuid = {
   requestUuid: string
-}
+};
 
 // GraphQL context
-interface GraphqlWithRequestContext extends AuthenticatedContext {
+type GraphqlWithRequest = {
   validatedRequest: {
     query: string
   }
-}
+};
 
 // User context
-interface UserValidatedRequest {
-  validatedRequest?: {
+type UserValidatedRequest = {
+  validatedRequest: {
     email: string
     password: string
   }
-}
+};
 
-export interface UserRecordsContext extends Context {
+type UserRecords = {
   records: {
-    user?: User,
-    users?: User[]
+    user: User,
+    users: User[]
   }
-}
+};
 
 // Auth context
-interface AuthValidatedRequestContext
-  extends Context {
+type AuthValidatedRequest = {
   validatedRequest: {
     email: string,
     password: string,
-    token?: string
+    token: string
   }
-}
+};
 
-export interface AuthRecordsAndRequestContext
-  extends ParameterizedContext {
-  records?: {
-    user?: User
+type AuthRecords = {
+  records: {
+    user: User
   }
-}
+};

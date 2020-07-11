@@ -1,11 +1,14 @@
 import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
 import { Token } from 'models';
-import { AuthenticatedContext, AuthRecordsAndRequestContext, AuthValidatedRequestContext } from 'types';
-import { Context, Middleware } from 'koa';
-import { UserAgentContext } from 'koa-useragent';
 
-export const logIn: Middleware = async (
-  ctx: AuthRecordsAndRequestContext & UserAgentContext
+import {
+  Context, Middleware, DefaultState
+} from 'koa';
+import { UserAgentContext } from 'koa-useragent';
+import { AuthRecords, AuthValidatedRequest, AuthenticatedContext } from 'types';
+
+export const logIn = async (
+  ctx: Context & AuthRecords & UserAgentContext
 ): Promise<void> => {
 
   try {
@@ -31,7 +34,9 @@ export const logIn: Middleware = async (
 };
 
 // The user the the parameter comes back from the authenticated middleware
-export const logOut: Middleware = async (ctx: AuthValidatedRequestContext): Promise<void> => {
+export const logOut = async (
+  ctx: Context & AuthValidatedRequest
+): Promise<void> => {
 
   try {
 
@@ -53,7 +58,9 @@ export const logOut: Middleware = async (ctx: AuthValidatedRequestContext): Prom
 };
 
 // The user the the parameter comes back from the authenticated middleware
-export const logOutAll: Middleware = async (ctx: AuthenticatedContext): Promise<void> => {
+export const logOutAll = async (
+  ctx: AuthenticatedContext
+): Promise<void> => {
 
   try {
 
@@ -75,7 +82,7 @@ export const logOutAll: Middleware = async (ctx: AuthenticatedContext): Promise<
 };
 
 // Check if the token sent is still valid
-export const checkToken: Middleware = async (ctx: Context): Promise<void> => {
+export const checkToken = async (ctx: Context): Promise<void> => {
 
   try {
 
@@ -92,8 +99,8 @@ export const checkToken: Middleware = async (ctx: Context): Promise<void> => {
 
 };
 
-export const requestResetPassword: Middleware = async (
-  ctx: AuthRecordsAndRequestContext & UserAgentContext
+export const requestResetPassword = async (
+  ctx: Context & AuthRecords & UserAgentContext
 ): Promise<void> => {
 
   try {
@@ -120,8 +127,8 @@ export const requestResetPassword: Middleware = async (
 
 };
 
-export const setPassword: Middleware = async (
-  ctx: AuthValidatedRequestContext & AuthenticatedContext & UserAgentContext
+export const setPassword = async (
+  ctx: AuthenticatedContext & AuthValidatedRequest & UserAgentContext
 ): Promise<void> => {
 
   try {

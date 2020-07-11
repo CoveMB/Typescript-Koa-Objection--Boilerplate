@@ -3,7 +3,7 @@
 /* eslint-disable no-param-reassign */
 import Token from 'models/User/Token/Token';
 import {
-  RelationMappings, Modifiers, QueryContext, ModelOptions
+  RelationMappings, Modifiers, QueryContext, ModelOptions, ModifierFunction, QueryBuilder
 } from 'objection';
 import Unique from 'objection-unique';
 import Password from 'objection-password';
@@ -29,7 +29,7 @@ export default class User extends BaseModel {
   admin!: boolean;
 
   // Needed until objection-password add types
-  verifyPassword: (password: string) => Promise<boolean>;
+  verifyPassword?: (password: string) => Promise<boolean>;
 
   tokens?: Token[];
 
@@ -113,7 +113,7 @@ export default class User extends BaseModel {
     ...BaseModel.modifiers,
 
     // This modifier control the data that can be accessed depending of the authenticated user
-    graphQLAccessControl(builder: UserQueryBuilder<User>, user: User): void {
+    graphQLAccessControl(builder: QueryBuilder<User>, user: User) {
 
       // Only the authenticated user should be accessible
       builder.where('id', user.id);
