@@ -1,6 +1,6 @@
 {
-  "name": "docker-node-express-boilerplate",
-  "description": "Boilerplate Dockerized Express app",
+  "name": "typescript-node-koa-boilerplate",
+  "description": "Boilerplate Dockerized Koa app",
   "main": "src/server.js",
   "scripts": {
     "start": "tsc && node dist/src/app.js",
