@@ -36,6 +36,11 @@ module.exports = {
     "overrides": { 
       "arrow": { "before": true, "after": true },
       "colon": { "before": false, "after": true } }}],
+    "@typescript-eslint/indent": [
+      "warn",
+      2,
+      {"SwitchCase": 1}
+    ],
     // length
     "max-len": [
       "warn",
@@ -144,11 +149,6 @@ module.exports = {
       {
         "omitLastInOneLineBlock": false
       }
-    ],
-    "@typescript-eslint/indent": [
-      "warn",
-      2,
-      {"SwitchCase": 1}
     ],
     "comma-spacing": [
       "warn",

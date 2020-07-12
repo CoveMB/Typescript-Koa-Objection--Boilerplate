@@ -13,39 +13,10 @@ type RequestWithUuid = {
   requestUuid: string
 };
 
-// GraphQL context
-type GraphqlWithRequest = {
-  validatedRequest: {
-    query: string
-  }
+type WithValidatedRequest<M> = {
+  validatedRequest: M
 };
 
-// User context
-type UserValidatedRequest = {
-  validatedRequest: {
-    email: string
-    password: string
-  }
-};
-
-type UserRecords = {
-  records: {
-    user: User,
-    users: User[]
-  }
-};
-
-// Auth context
-type AuthValidatedRequest = {
-  validatedRequest: {
-    email: string,
-    password: string,
-    token: string
-  }
-};
-
-type AuthRecords = {
-  records: {
-    user: User
-  }
+type WithRecords<M> = {
+  records: M
 };

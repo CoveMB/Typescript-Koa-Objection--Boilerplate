@@ -1,11 +1,12 @@
 import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
-import { Token } from 'models';
+import { Token, User } from 'models';
 import { Context } from 'koa';
 import { UserAgentContext } from 'koa-useragent';
-import { AuthRecords, AuthValidatedRequest, AuthenticatedContext } from 'types';
+import { AuthenticatedContext, WithRecords, WithValidatedRequest } from 'types';
+import { PartialModelGraph, PartialModelObject } from 'objection';
 
 export const logIn = async (
-  ctx: Context & AuthRecords & UserAgentContext
+  ctx: Context & WithRecords<{user: User}> & UserAgentContext
 ): Promise<void> => {
 
   try {
@@ -32,7 +33,7 @@ export const logIn = async (
 
 // The user the the parameter comes back from the authenticated middleware
 export const logOut = async (
-  ctx: Context & AuthValidatedRequest
+  ctx: Context & WithValidatedRequest<{token: string}>
 ): Promise<void> => {
 
   try {
@@ -97,7 +98,7 @@ export const checkToken = async (ctx: Context): Promise<void> => {
 };
 
 export const requestResetPassword = async (
-  ctx: Context & AuthRecords & UserAgentContext
+  ctx: Context & WithRecords<{user: User}> & UserAgentContext
 ): Promise<void> => {
 
   try {
@@ -125,7 +126,7 @@ export const requestResetPassword = async (
 };
 
 export const setPassword = async (
-  ctx: AuthenticatedContext & AuthValidatedRequest & UserAgentContext
+  ctx: AuthenticatedContext & WithValidatedRequest<{password: string}> & UserAgentContext
 ): Promise<void> => {
 
   try {

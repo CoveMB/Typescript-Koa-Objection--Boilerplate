@@ -1,7 +1,7 @@
 import { User, Token } from 'models';
 import { sendConfirmationEmail } from 'models/User/Token/token.emails';
 import { Context } from 'koa';
-import { AuthenticatedContext, UserValidatedRequest, UserRecords } from 'types';
+import { AuthenticatedContext, WithRecords, WithValidatedRequest } from 'types';
 
 // The user the the parameter comes from the authenticated middleware
 export const getProfile = async (
@@ -28,7 +28,7 @@ export const getProfile = async (
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
 export const getOne = async (
-  ctx: Context & UserRecords
+  ctx: Context & WithRecords<{user: User}>
 ): Promise<void> => {
 
   try {
@@ -50,7 +50,7 @@ export const getOne = async (
 };
 
 export const getAll = async (
-  ctx: Context & UserRecords
+  ctx: Context & WithRecords<{users: User[]}>
 ): Promise<void> => {
 
   try {
@@ -102,7 +102,7 @@ export const createOne = async (ctx: Context): Promise<void> => {
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
 export const updateOne = async (
-  ctx: Context & UserRecords & UserValidatedRequest
+  ctx: Context & WithRecords<{user: User}> & WithValidatedRequest<{email: string, password: string}>
 ): Promise<void> => {
 
   try {
@@ -130,7 +130,7 @@ export const updateOne = async (
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
 export const deleteOne = async (
-  ctx: Context & UserRecords
+  ctx: Context & WithRecords<{user: User}>
 ): Promise<void> => {
 
   try {
