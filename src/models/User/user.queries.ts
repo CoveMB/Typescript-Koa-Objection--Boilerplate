@@ -26,14 +26,9 @@ export default class UserQueryBuilder<M extends Model, R = M[]>
 
     }
 
-    let authenticated;
-
-    // This guard is needed until objection-password add types
-    if (user.verifyPassword) {
-
-      authenticated = await user.verifyPassword(password);
-
-    }
+    // Eslint disable needed until objection-password add types, verifyPassword does exist on User
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const authenticated = await user.verifyPassword!(password);
 
     // If the password could not be validated throw login error
     if (!authenticated) {

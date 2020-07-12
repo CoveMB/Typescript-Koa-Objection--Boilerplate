@@ -24,12 +24,6 @@
       "node_modules/@types"
     ]
   },
-  // "include": [
-  //   "./src/**/*",
-  //   "./__test__/**/*",
-  //   "./migrations/**/*",
-  //   "./seeds/**/*"
-  // ],
   "exclude": [
     "node_modules"
   ]

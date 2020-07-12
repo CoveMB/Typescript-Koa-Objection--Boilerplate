@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { NotAuthenticatedError } from 'config/errors/error.types';
 import configServer from 'config/server';
@@ -179,7 +180,7 @@ test('Should revoke all tokens', async () => {
   expect(logoutResponse.status).toBe(200);
 
   // The user does not have any more token
-  expect(dbUser.tokens ? dbUser.tokens.length : undefined).toBe(0);
+  expect(dbUser.tokens!.length).toBe(0);
 
 });
 
@@ -248,7 +249,7 @@ test('Should request a password reset generating a temporary 1h valid token', as
   // Mutate now to be 1 hour from now
   now.setHours(now.getHours() + 1);
 
-  const expirationHour = userDb.tokens ? userDb.tokens[0].expiration.getHours() : undefined;
+  const expirationHour = userDb.tokens![0].expiration.getHours();
 
   expect(response.status).toBe(200);
 
@@ -353,22 +354,15 @@ test('Should reset the password and generate a fresh token and revoke all other 
   // Mutate now to be 6 month from now
   now.setMonth(now.getMonth() + 6);
 
-  const userTokenExpiration = userDbAfterReset.tokens
-    ? userDbAfterReset.tokens[0].expiration.getMonth() : undefined;
-
-  const userTokenToken = userDbAfterReset.tokens
-    ? userDbAfterReset.tokens[0].token : undefined;
-
-  const bnTokens = userDbAfterReset.tokens
-    ? userDbAfterReset.tokens.length : undefined;
+  const userTokens = userDbAfterReset.tokens!;
 
   // The body should contains the new token
-  expect(response.body.token.token).toBe(userTokenToken);
+  expect(response.body.token.token).toBe(userTokens[0].token);
 
   // The new token should be 6 month valid
-  expect(userTokenExpiration).toBe(now.getMonth());
+  expect(userTokens[0].expiration.getMonth()).toBe(now.getMonth());
 
   // All other tokens should has been revoked
-  expect(bnTokens).toBe(1);
+  expect(userTokens.length).toBe(1);
 
 });

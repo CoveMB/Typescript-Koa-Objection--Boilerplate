@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ValidationError } from 'config/errors/error.types';
 import configServer from 'config/server';
 import { User } from 'models';
@@ -27,11 +28,7 @@ test('Should sign up new user, sending new token by email', async () => {
     .findOne({ email: newUser.email })
     .withGraphFetched('tokens(orderByCreation)');
 
-  const tokenExpiration = newUserDB.tokens
-    ? newUserDB.tokens[0].expiration.getHours() : undefined;
-
-  const numberOfTokens = newUserDB.tokens
-    ? newUserDB.tokens.length : undefined;
+  const userTokens = newUserDB.tokens!;
 
   // Get the expiration date of last generated token
   const now = new Date();
@@ -43,10 +40,10 @@ test('Should sign up new user, sending new token by email', async () => {
   expect(newUserDB).not.toBeUndefined();
 
   // The newt user should have one new token
-  expect(numberOfTokens).toBe(1);
+  expect(userTokens.length).toBe(1);
 
   // The expiration date of new token should be in an hour
-  expect(tokenExpiration).toBeLessThanOrEqual(now.getHours() + 1);
+  expect(userTokens[0].expiration.getHours()).toBeLessThanOrEqual(now.getHours() + 1);
 
 });
 
@@ -68,7 +65,7 @@ test('Should update user', async () => {
     .findOne({ email: newUser.email })
     .withGraphFetched('tokens(orderByCreation)');
 
-  const token = tokens ? tokens[0].token : '';
+  const token = tokens![0].token!;
 
   // Request a user update with the fresh token
   const response = await request
@@ -126,7 +123,7 @@ test('Should delete user', async () => {
     .findOne({ email: newUser.email })
     .withGraphFetched('tokens(orderByCreation)');
 
-  const token = tokens ? tokens[0].token : undefined;
+  const token = tokens![0].token!;
 
   // Request user delete
   const response = await request
