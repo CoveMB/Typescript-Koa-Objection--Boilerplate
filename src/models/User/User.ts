@@ -1,15 +1,15 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable no-param-reassign */
+import BaseModel from 'models/BaseModel';
 import Token from 'models/User/Token/Token';
 import {
-  RelationMappings, Modifiers, QueryContext, ModelOptions, ModifierFunction, QueryBuilder
+  ModelOptions, Modifiers, QueryBuilder, QueryContext, RelationMappings
 } from 'objection';
-import Unique from 'objection-unique';
 import Password from 'objection-password';
-import BaseModel from 'models/BaseModel';
-import validateUserInput from './user.validations';
+import Unique from 'objection-unique';
 import UserQueryBuilder from './user.queries';
+import validateUserInput from './user.validations';
 
 // This plugin allow for unique validation on model
 @Unique({
@@ -21,9 +21,10 @@ import UserQueryBuilder from './user.queries';
 @Password({
   allowEmptyPassword: true
 })
+
 export default class User extends BaseModel {
 
-  uuid!: string;
+  // Properties types
   email!: string;
   password!: string;
   admin!: boolean;
@@ -31,8 +32,10 @@ export default class User extends BaseModel {
   // Needed until objection-password add types
   verifyPassword?: (password: string) => Promise<boolean>;
 
+  // Relationships types
   tokens?: Token[];
 
+  // Query type
   QueryBuilderType!: UserQueryBuilder<this>;
 
   // This register the custom query builder

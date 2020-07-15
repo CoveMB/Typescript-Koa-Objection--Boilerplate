@@ -1,7 +1,7 @@
+import { Next } from 'koa';
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
-import { Next } from 'koa';
-import { RequestWithUuid, AuthenticatedContext } from 'types';
+import { AuthenticatedContext } from 'types';
 
 export const getByIdRecords = async (
   ctx: AuthenticatedContext & RequestWithUuid,

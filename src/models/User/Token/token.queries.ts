@@ -1,15 +1,12 @@
 /* eslint-disable import/no-cycle */
-import { NotAuthenticatedError, ExpiredTokenError } from 'config/errors/error.types';
-import jwt from 'jsonwebtoken';
+import { ExpiredTokenError, NotAuthenticatedError } from 'config/errors/error.types';
 import { jwtSecret } from 'config/variables';
-import BaseQueryBuilder from 'models/Base.queries';
-import {
-  Model, Page, PartialModelGraph, GraphParameters
-} from 'objection';
-import { ReturnToken } from 'types';
+import jwt from 'jsonwebtoken';
 import UserAgent from 'koa-useragent/dist/lib/useragent';
-import Token from './Token';
+import BaseQueryBuilder from 'models/Base.queries';
+import { Model, Page, PartialModelGraph } from 'objection';
 import User from '../User';
+import Token from './Token';
 
 export default class TokenQueryBuilder<M extends Model, R = M[]>
   extends BaseQueryBuilder<M, R> {
@@ -80,7 +77,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
         expiration: date,
         device    : `${os || 'unknown'} - ${browser || 'unknown'}`,
         user,
-      }) as unknown as PartialModelGraph<M, M & GraphParameters>, {
+      }) as unknown as PartialModelGraph<M>, {
         relate: true
       }
     );

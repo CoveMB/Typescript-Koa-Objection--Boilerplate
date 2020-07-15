@@ -1,4 +1,4 @@
-export type ReturnToken = {
+type ReturnToken = {
   token: string,
   expiration: Date
 };

@@ -1,11 +1,11 @@
-import { EmailNotSentError } from 'config/errors/error.types';
-import { errorEvent } from 'config/errors/error.event';
-import { emailFrom, clientUrl } from 'config/variables';
-import sgMailClient from 'config/emails';
 import { MailService } from '@sendgrid/mail';
+import sgMailClient from 'config/emails';
+import { errorEvent } from 'config/errors/error.event';
+import { EmailNotSentError } from 'config/errors/error.types';
+import { clientUrl, emailFrom } from 'config/variables';
 import { Context } from 'koa';
 import { User } from 'models';
-import { ReturnToken, TokenEmailClient } from 'types';
+import { TokenEmailClient } from 'types';
 
 const sender = (emailClient: MailService): TokenEmailClient => ({
   async sendConfirmationEmail(

@@ -1,10 +1,10 @@
 import { authenticated } from 'globalMiddlewares';
-import KoaRouter from 'koa-router';
-import { Constructable } from 'types/global';
 import { Middleware } from 'koa';
-import * as requests from './middlewares/auth.requests';
-import * as records from './middlewares/auth.records';
+import KoaRouter from 'koa-router';
+import { Constructable } from 'types';
 import * as controller from './auth.controller';
+import * as records from './middlewares/auth.records';
+import * as requests from './middlewares/auth.requests';
 
 // as unknown is needed because of the missing next paramter in controller
 

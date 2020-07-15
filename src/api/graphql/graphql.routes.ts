@@ -1,9 +1,9 @@
 import { authenticated } from 'globalMiddlewares';
-import KoaRouter from 'koa-router';
-import { Constructable } from 'types/global';
 import { Middleware } from 'koa';
-import * as requests from './middlewares/graphql.requests';
+import KoaRouter from 'koa-router';
+import { Constructable } from 'types';
 import * as controller from './graphql.controller';
+import * as requests from './middlewares/graphql.requests';
 
 module.exports = (Router: Constructable<KoaRouter>) => {
 

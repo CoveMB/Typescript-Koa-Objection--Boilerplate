@@ -1,9 +1,8 @@
-import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
-import { Token, User } from 'models';
 import { Context } from 'koa';
 import { UserAgentContext } from 'koa-useragent';
-import { AuthenticatedContext, WithRecords, WithValidatedRequest } from 'types';
-import { PartialModelGraph, PartialModelObject } from 'objection';
+import { Token, User } from 'models';
+import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
+import { AuthenticatedContext } from 'types';
 
 export const logIn = async (
   ctx: Context & WithRecords<{user: User}> & UserAgentContext

@@ -1,11 +1,12 @@
 import {
-  Model, Modifiers, ModelOptions, QueryContext
+  Model, ModelOptions, Modifiers, QueryContext
 } from 'objection';
 import BaseQueryBuilder from './Base.queries';
 
 export default class BaseModel extends Model {
 
   id!: number;
+  uuid!: string;
   createdAt!: string;
   updatedAt!: string;
 

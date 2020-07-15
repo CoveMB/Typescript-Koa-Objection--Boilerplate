@@ -1,6 +1,5 @@
-import { User } from 'models';
-import { ReturnToken } from 'types';
 import { Context } from 'koa';
+import { User } from 'models';
 
 export type SendTokenEmail = ((
   ctx: Context,

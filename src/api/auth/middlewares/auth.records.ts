@@ -1,7 +1,6 @@
+import { Context, Next } from 'koa';
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
-import { WithValidatedRequest, Credentials } from 'types';
-import { Next, Context } from 'koa';
 
 export const loginRecords = async (
   ctx: Context & WithValidatedRequest<Credentials>,

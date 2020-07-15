@@ -1,10 +1,10 @@
-import graphqlHTTP from 'koa-graphql';
+import { ImplementationMissingError } from 'config/errors/error.types';
 import graphQlSchema from 'config/graphql';
 import { isDevelopment } from 'config/variables';
-import { ImplementationMissingError } from 'config/errors/error.types';
-import { QueryBuilder, Model } from 'objection';
-import { AuthenticatedContext, WithValidatedRequest } from 'types';
 import { Next } from 'koa';
+import graphqlHTTP from 'koa-graphql';
+import { Model, QueryBuilder } from 'objection';
+import { AuthenticatedContext } from 'types';
 
 // All graphQL queries are handled by graphqlHTTP
 export const graphql = async (

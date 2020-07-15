@@ -1,11 +1,11 @@
 import { authenticated } from 'globalMiddlewares';
-import KoaRouter from 'koa-router';
-import { Constructable } from 'types/global';
 import { Middleware } from 'koa';
-import * as controller from './user.controller';
-import * as requests from './middlewares/user.requests';
+import KoaRouter from 'koa-router';
+import { Constructable } from 'types';
 import * as access from './middlewares/user.access';
 import * as records from './middlewares/user.records';
+import * as requests from './middlewares/user.requests';
+import * as controller from './user.controller';
 
 module.exports = (Router: Constructable<KoaRouter>) => {
 

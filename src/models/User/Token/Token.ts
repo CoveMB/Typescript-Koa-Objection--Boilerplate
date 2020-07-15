@@ -1,23 +1,27 @@
 /* eslint-disable import/no-cycle */
 import BaseModel from 'models/BaseModel';
 import User from 'models/User/User';
-import { RelationMappings, Modifiers } from 'objection';
+import { Modifiers, RelationMappings } from 'objection';
 import TokenQueryBuilder from './token.queries';
 
 export default class Token extends BaseModel {
 
-  uuid!: string;
+  // Properties types
   userId!: number;
   device!: string;
   expiration!: Date;
   token!: string;
+
+  // Relationships types
   user!: User;
 
+  // Query type
   QueryBuilderType!: TokenQueryBuilder<this>;
 
-  static tableName = 'token';
-
+  // This register the custom query builder
   static QueryBuilder = TokenQueryBuilder;
+
+  static tableName = 'token';
 
   static jsonSchema = {
 

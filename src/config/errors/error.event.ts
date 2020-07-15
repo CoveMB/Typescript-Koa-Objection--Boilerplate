@@ -1,7 +1,6 @@
 import logger from 'config/logger';
-import { getFullDate } from 'utils';
-import { sanitizeExposedBody } from 'utils/sanitizer';
 import { Context } from 'koa';
+import { getFullDate, sanitizeExposedBody } from 'utils';
 
 const errorEvent = 'error';
 

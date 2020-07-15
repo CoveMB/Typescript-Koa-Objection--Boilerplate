@@ -2,7 +2,6 @@
 import { LoginError } from 'config/errors/error.types';
 import BaseQueryBuilder from 'models/Base.queries';
 import { Model, Page } from 'objection';
-import { Credentials } from 'types';
 import User from './User';
 
 export default class UserQueryBuilder<M extends Model, R = M[]>

@@ -1,7 +1,6 @@
 import logger from 'config/logger';
-import { getFullDate } from 'utils';
-import { sanitizeExposedBody } from 'utils/sanitizer';
 import { Context, Next } from 'koa';
+import { getFullDate, sanitizeExposedBody } from 'utils';
 
 const log = async (ctx: Context, next: Next): Promise<void> => {
 
