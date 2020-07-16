@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   Model, ModelOptions, Modifiers, QueryContext
 } from 'objection';
@@ -7,8 +8,8 @@ export default class BaseModel extends Model {
 
   id!: number;
   uuid!: string;
-  createdAt!: string;
-  updatedAt!: string;
+  created_at!: string;
+  updated_at!: string;
 
   QueryBuilderType!: BaseQueryBuilder<this>;
 
