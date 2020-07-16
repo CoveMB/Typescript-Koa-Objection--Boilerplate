@@ -31,5 +31,7 @@ RUN npm config set scripts-prepend-node-path true
 # Copy existing local files into container, and set permission to node user
 COPY --chown=node:node  . .
 
+RUN tsc || exit 0
+
 # Use your dev command described in package.json
 CMD [ "yarn", "start" ]

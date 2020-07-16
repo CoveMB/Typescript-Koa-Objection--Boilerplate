@@ -3,7 +3,7 @@
   "description": "Boilerplate Dockerized Koa app",
   "main": "src/server.js",
   "scripts": {
-    "start": "tsc && node dist/src/app.js",
+    "start": "node dist/src/app.js",
     "dev": "ts-node-dev --ignore-watch node_modules --inspect=0.0.0.0:9229 -- ./src/app.ts",
     "test-watch": "jest --watchAll -i",
     "test": "jest -i",
