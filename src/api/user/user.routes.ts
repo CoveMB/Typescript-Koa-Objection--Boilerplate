@@ -1,13 +1,12 @@
 import { authenticated } from 'globalMiddlewares';
 import { Middleware } from 'koa';
-import KoaRouter from 'koa-router';
-import { Constructable } from 'types';
+import Router from 'koa-router';
 import * as access from './middlewares/user.access';
 import * as records from './middlewares/user.records';
 import * as requests from './middlewares/user.requests';
 import * as controller from './user.controller';
 
-module.exports = (Router: Constructable<KoaRouter>) => {
+const userSubRouter = () => {
 
   const router = new Router({
     prefix: '/users',
@@ -54,6 +53,8 @@ module.exports = (Router: Constructable<KoaRouter>) => {
       controller.deleteOne as unknown as Middleware
     );
 
-  return router;
+  return router.routes();
 
 };
+
+export default userSubRouter;

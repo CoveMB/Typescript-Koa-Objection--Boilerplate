@@ -9,3 +9,9 @@ type WithValidatedRequest<M> = {
 type WithRecords<M> = {
   records: M
 };
+
+type WithBody<M> = {
+  request: {
+    body: M
+  }
+};

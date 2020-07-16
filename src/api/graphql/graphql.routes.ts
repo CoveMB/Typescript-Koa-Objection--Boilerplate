@@ -1,11 +1,10 @@
 import { authenticated } from 'globalMiddlewares';
 import { Middleware } from 'koa';
-import KoaRouter from 'koa-router';
-import { Constructable } from 'types';
+import Router from 'koa-router';
 import * as controller from './graphql.controller';
 import * as requests from './middlewares/graphql.requests';
 
-module.exports = (Router: Constructable<KoaRouter>) => {
+const graphqlSubRouter = () => {
 
   const router = new Router({
     prefix: '/graphql',
@@ -19,6 +18,8 @@ module.exports = (Router: Constructable<KoaRouter>) => {
       controller.graphql as Middleware
     );
 
-  return router;
+  return router.routes();
 
 };
+
+export default graphqlSubRouter;

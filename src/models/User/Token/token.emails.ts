@@ -3,20 +3,14 @@ import sgMailClient from 'config/emails';
 import { errorEvent } from 'config/errors/error.event';
 import { EmailNotSentError } from 'config/errors/error.types';
 import { clientUrl, emailFrom } from 'config/variables';
-import { Context } from 'koa';
-import { User } from 'models';
 import { TokenEmailClient } from 'types';
 
 const sender = (emailClient: MailService): TokenEmailClient => ({
-  async sendConfirmationEmail(
-    ctx: Context,
-    { email }: User,
-    { token }: ReturnToken
-  ): Promise<void> {
+  async sendConfirmationEmail(ctx, { email }, { token }) {
 
     try {
 
-      await emailClient.send({
+      emailClient.send({
         to     : email,
         from   : emailFrom,
         subject: 'Thanks for joining in!',
@@ -33,15 +27,11 @@ const sender = (emailClient: MailService): TokenEmailClient => ({
     }
 
   },
-  async sendResetPasswordEmail(
-    ctx: Context,
-    { email }: User,
-    { token }: ReturnToken
-  ): Promise<void> {
+  async sendResetPasswordEmail(ctx, { email }, { token }) {
 
     try {
 
-      await emailClient.send({
+      emailClient.send({
         to     : email,
         from   : emailFrom,
         subject: 'Reset your password',

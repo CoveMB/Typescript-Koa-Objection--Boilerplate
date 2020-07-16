@@ -1,14 +1,11 @@
 import { authenticated } from 'globalMiddlewares';
 import { Middleware } from 'koa';
-import KoaRouter from 'koa-router';
-import { Constructable } from 'types';
+import Router from 'koa-router';
 import * as controller from './auth.controller';
 import * as records from './middlewares/auth.records';
 import * as requests from './middlewares/auth.requests';
 
-// as unknown is needed because of the missing next paramter in controller
-
-module.exports = (Router: Constructable<KoaRouter>) => {
+const authSubRouter = () => {
 
   const router = new Router();
 
@@ -49,6 +46,8 @@ module.exports = (Router: Constructable<KoaRouter>) => {
       controller.setPassword as unknown as Middleware
     );
 
-  return router;
+  return router.routes();
 
 };
+
+export default authSubRouter;

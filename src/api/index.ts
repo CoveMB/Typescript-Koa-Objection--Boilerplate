@@ -1,10 +1,9 @@
 import { apiVersion } from 'config/variables';
-import fs from 'fs';
-import Router from 'koa-router';
-import path from 'path';
 import Koa from 'koa';
-
-const baseName = path.basename(__filename);
+import Router from 'koa-router';
+import authRouter from './auth/auth.routes';
+import graphqlRouter from './graphql/graphql.routes';
+import userRouter from './user/user.routes';
 
 const registerRouters = (app: Koa): Koa => {
 
@@ -12,17 +11,13 @@ const registerRouters = (app: Koa): Koa => {
     prefix: `/api/${apiVersion}`,
   });
 
-  // Require all the folders and create a sub-router for each feature api
-  fs.readdirSync(__dirname)
-    .filter(file => file.indexOf('.') !== 0 && file !== baseName)
-    .forEach(file => {
+  router.use(authRouter());
+  router.use(graphqlRouter());
+  router.use(userRouter());
 
-      const api = require(path.join(__dirname, file))(Router); // eslint-disable-line
-
-      router.use(api.routes());
-
-    });
-  app.use(router.routes()).use(router.allowedMethods());
+  app
+    .use(router.routes())
+    .use(router.allowedMethods());
 
   return app;
 
