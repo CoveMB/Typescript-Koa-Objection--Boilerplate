@@ -8,8 +8,8 @@ export default class BaseModel extends Model {
 
   id!: number;
   uuid!: string;
-  created_at!: string;
-  updated_at!: string;
+  createdAt!: string;
+  updatedAt!: string;
 
   QueryBuilderType!: BaseQueryBuilder<this>;
 

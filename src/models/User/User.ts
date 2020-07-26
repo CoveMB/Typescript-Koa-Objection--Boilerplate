@@ -80,8 +80,8 @@ export default class User extends BaseModel {
 
     delete user.password;
     delete user.admin;
-    delete user.created_at;
-    delete user.updated_at;
+    delete user.createdAt;
+    delete user.updatedAt;
 
     return user;
 
