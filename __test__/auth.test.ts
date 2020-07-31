@@ -377,3 +377,43 @@ test('Should reset the password and generate a fresh token and revoke all other 
   expect(userTokens.length).toBe(1);
 
 });
+
+test('Should login through a third party authentication and update profiles', async () => {
+
+  const { email } = getUserData();
+
+  const profilePicture = 'http://profile.png';
+
+  // Create an extra token
+  const response = await request
+    .post('/api/v1/register-third-party')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .send({
+      user: {
+        email, profilePicture
+      }
+    });
+
+  // Query the user and it's token by order of creation
+  const userDb = await User.query()
+    .findOne({ email })
+    .withGraphFetched('tokens(orderByCreation)');
+
+  // Get it's expiration date
+  const now = new Date();
+
+  // Mutate now to be 6 month from now
+  now.setMonth(now.getMonth() + 6);
+
+  const userTokens = userDb.tokens!;
+
+  // The body should contains the new token
+  expect(response.body.token.token).toBe(userTokens[0].token);
+
+  // The new token should be 6 month valid
+  expect(userTokens[1].expiration.getMonth()).toBe(now.getMonth());
+
+  // Should have updated user's data
+  expect(userDb.profilePicture).toBe(profilePicture);
+
+});

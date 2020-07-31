@@ -37,8 +37,7 @@ export const registerThirdPartySchema = validateRequest(Joi.object({
   user: Joi
     .object({
       name: Joi
-        .string()
-        .required(),
+        .string(),
       email: Joi
         .string()
         .email()
