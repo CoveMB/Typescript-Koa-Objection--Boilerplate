@@ -22,8 +22,15 @@ export async function up(knex: Knex): Promise<void> {
       table
         .string('password')
         .nullable();
-      table.timestamp('createdAt').defaultTo(knex.fn.now());
-      table.timestamp('updatedAt').defaultTo(null);
+      table.string('name')
+        .nullable();
+      table.string('google_id')
+        .unique()
+        .nullable();
+      table.timestamp('created_at')
+        .defaultTo(knex.fn.now());
+      table.timestamp('updated_at')
+        .defaultTo(null);
 
     })
 
@@ -42,10 +49,14 @@ export async function up(knex: Knex): Promise<void> {
         .references('user.id')
         .onDelete('CASCADE')
         .index();
-      table.dateTime('expiration').nullable();
-      table.string('device').nullable();
-      table.timestamp('createdAt').defaultTo(knex.fn.now());
-      table.timestamp('updatedAt').defaultTo(null);
+      table.dateTime('expiration')
+        .nullable();
+      table.string('device')
+        .nullable();
+      table.timestamp('created_at')
+        .defaultTo(knex.fn.now());
+      table.timestamp('updated_at')
+        .defaultTo(null);
 
     });
 

@@ -68,7 +68,7 @@ export default class User extends BaseModel {
       modelClass: Token,
       join      : {
         from: 'user.id',
-        to  : 'token.user_id'
+        to  : 'token.userId'
       }
     }
   });

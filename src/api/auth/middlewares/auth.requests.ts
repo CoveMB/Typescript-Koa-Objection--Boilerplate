@@ -32,3 +32,20 @@ export const requestResetPasswordSchema = validateRequest(Joi.object({
     .email()
     .required()
 }));
+
+export const registerThirdPartySchema = validateRequest(Joi.object({
+  user: Joi
+    .object({
+      name: Joi
+        .string()
+        .required(),
+      email: Joi
+        .string()
+        .email()
+        .required(),
+      profilePicture: Joi
+        .string(),
+      googleId: Joi
+        .string()
+    })
+}));

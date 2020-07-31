@@ -39,6 +39,13 @@ const authSubRouter = () => {
       '/set-password',
       requests.setPasswordSchema as Middleware,
       controller.setPassword as unknown as Middleware
+    )
+    .post(
+      '/register-third-party',
+      requests.registerThirdPartySchema as Middleware,
+      records.registerThirdPartyRecords as Middleware,
+      controller.registerThirdParty as unknown as Middleware
+
     );
 
   return router.routes();

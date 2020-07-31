@@ -1,6 +1,7 @@
 import { Context, Next } from 'koa';
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
+import { PartialModelObject } from 'objection';
 
 export const loginRecords = async (
   ctx: Context & WithValidatedRequest<Credentials>,
@@ -42,6 +43,40 @@ export const requestResetPasswordRecords = async (
     validateFoundInstances([
       {
         instance: user, type: 'User', search: 'email'
+      }
+    ]);
+
+    // Attach it to the context
+    ctx.records = { user };
+
+  } catch (error) {
+
+    ctx.throw(error);
+
+  }
+
+  await next();
+
+};
+
+export const registerThirdPartyRecords = async (
+  ctx: Context & WithValidatedRequest<{user: PartialModelObject<User>}>,
+  next: Next
+): Promise<void> => {
+
+  try {
+
+    const { validatedRequest } = ctx;
+
+    // Find existing user with email or create it
+    const user = await User
+      .query()
+      .findOrCreate({ email: validatedRequest.user.email });
+
+    // Validate that a user was found
+    validateFoundInstances([
+      {
+        instance: user, type: 'User', search: validatedRequest.user.email as string
       }
     ]);
 

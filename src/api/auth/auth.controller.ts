@@ -3,6 +3,8 @@ import { UserAgentContext } from 'koa-useragent';
 import { Token, User } from 'models';
 import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
 import { AuthenticatedContext } from 'types';
+import { PartialModelObject } from 'objection';
+import { getDevice } from 'utils';
 
 export const logIn = async (
   ctx: Context & WithRecords<{user: User}> & UserAgentContext
@@ -135,7 +137,7 @@ export const setPassword = async (
 
     // Update the user
     await user.$query()
-      .patchAndFetch(validatedRequest);
+      .patch(validatedRequest);
 
     // Revoke other tokens
     await Token.query()
@@ -149,6 +151,42 @@ export const setPassword = async (
       status: 'success',
       user,
       token : newToken
+    };
+
+  } catch (error) {
+
+    ctx.throw(error);
+
+  }
+
+};
+
+export const registerThirdParty = async (
+  ctx: Context &
+  WithRecords<{
+    user: User
+  }> & UserAgentContext
+): Promise<void> => {
+
+  try {
+
+    const { validatedRequest, records, userAgent } = ctx;
+    const { user } = records;
+
+    // Update with latest google info
+    const updatedUser = await user.$query()
+      .patchAndFetch(validatedRequest.user);
+
+    // Generate JWT token for authentication
+    const token = await Token.query()
+      .generateAuthToken(user, userAgent);
+
+    // And send it back
+    ctx.status = 200;
+    ctx.body = {
+      status: 'success',
+      user  : updatedUser,
+      token
     };
 
   } catch (error) {

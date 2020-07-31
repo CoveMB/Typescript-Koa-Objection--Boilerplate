@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import UserAgent from 'koa-useragent/dist/lib/useragent';
 import BaseQueryBuilder from 'models/Base.queries';
 import { Model, Page, PartialModelGraph } from 'objection';
+import { getDevice } from 'utils/userAgent';
 import User from '../User';
 import Token from './Token';
 
@@ -47,7 +48,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
   // If temporary it will have an expiration date
   async generateAuthToken(
     user: User,
-    { browser, os }: UserAgent,
+    userAgent: UserAgent,
     temporary = false
   ): Promise<ReturnToken> {
 
@@ -75,7 +76,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
       ({
         token,
         expiration: date,
-        device    : `${os || 'unknown'} - ${browser || 'unknown'}`,
+        device    : getDevice(userAgent),
         user,
       }) as unknown as PartialModelGraph<M>, {
         relate: true
@@ -101,7 +102,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
   async revokeAllAuthTokens(user: User): Promise<number> {
 
     return this
-      .where({ user_id: user.id })
+      .where({ userId: user.id })
       .delete();
 
   }

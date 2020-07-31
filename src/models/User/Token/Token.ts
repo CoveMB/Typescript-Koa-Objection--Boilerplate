@@ -48,7 +48,7 @@ export default class Token extends BaseModel {
       relation  : BaseModel.BelongsToOneRelation,
       modelClass: User,
       join      : {
-        from: 'token.user_id',
+        from: 'token.userId',
         to  : 'user.id'
       }
     },
@@ -64,7 +64,7 @@ export default class Token extends BaseModel {
     graphQLAccessControl(builder, user) {
 
       // Only the tokens from the authenticated user should be accessible
-      builder.where('user_id', user.id);
+      builder.where('userId', user.id);
 
     }
   };
