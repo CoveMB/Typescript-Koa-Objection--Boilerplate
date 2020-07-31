@@ -1,12 +1,11 @@
 /* eslint-disable import/first */
 import { addPath } from 'app-module-path';
-
-addPath(`${__dirname}/src`);
-
 import { ConfigError } from 'config/errors/error.types';
 import {
-  dbHost, dbPort, dbUser, dbPassword, dbName
+  dbHost, dbName, dbPassword, dbPort, dbUser
 } from 'config/variables';
+
+addPath(`${__dirname}/src`);
 
 const getKnexConfig = (configType: 'production' | 'test' = 'production') => {
 
@@ -20,6 +19,9 @@ const getKnexConfig = (configType: 'production' | 'test' = 'production') => {
         user    : dbUser || 'postgres',
         password: dbPassword || undefined,
         database: dbName
+      },
+      pool: {
+        min: 1, max: 1
       },
       migrations: {
         directory: 'migrations',

@@ -4,6 +4,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node dist/src/app.js",
+    "command": "cd ./commands/ && ts-node --",
     "dev": "ts-node-dev --ignore-watch node_modules --inspect=0.0.0.0:9229 -- ./src/app.ts",
     "test-watch": "jest --watchAll -i",
     "test": "jest -i"
