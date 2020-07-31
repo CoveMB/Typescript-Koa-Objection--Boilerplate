@@ -1,7 +1,7 @@
 import cors from '@koa/cors';
 import corsOptions from 'config/cors';
 import { errorEvent, errorHandler } from 'config/errors/error.event';
-import { error, log } from 'globalMiddlewares';
+import { error, log, authenticated } from 'globalMiddlewares';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import compress from 'koa-compress';
@@ -26,7 +26,8 @@ const configServer = (): Koa => {
     .use(bodyParser())         // Parse the body request
     .use(log)                  // Log every logRequests
     .use(error)                // Handle trowed errors
-    .use(compress());          // Allow compress
+    .use(compress())           // Allow compress
+    .use(authenticated);       // Makes sure every request are authenticated
 
   /**
    * Register events

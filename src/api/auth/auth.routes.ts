@@ -1,4 +1,3 @@
-import { authenticated } from 'globalMiddlewares';
 import { Middleware } from 'koa';
 import Router from 'koa-router';
 import * as controller from './auth.controller';
@@ -19,18 +18,15 @@ const authSubRouter = () => {
     .post(
       '/logout',
       requests.logoutSchema as Middleware,
-      authenticated as Middleware,
       controller.logOut as unknown as Middleware
     )
     .post(
       '/logout-all',
       requests.logoutAllSchema as Middleware,
-      authenticated as Middleware,
       controller.logOutAll as unknown as Middleware
     )
     .post(
       '/check-token',
-      authenticated as Middleware,
       controller.checkToken as Middleware
     )
     .post(
@@ -42,7 +38,6 @@ const authSubRouter = () => {
     .post(
       '/set-password',
       requests.setPasswordSchema as Middleware,
-      authenticated as Middleware,
       controller.setPassword as unknown as Middleware
     );
 

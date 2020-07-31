@@ -15,19 +15,16 @@ const userSubRouter = () => {
   router
     .get(
       '/profile',
-      authenticated as Middleware,
       controller.getProfile as unknown as Middleware
     )
     .get(
       '/:uuid',
-      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getByIdRecords as Middleware,
       controller.getOne as unknown as Middleware
     )
     .get(
       '/',
-      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getAllRecords as Middleware,
       controller.getAll as unknown as Middleware
@@ -40,14 +37,12 @@ const userSubRouter = () => {
     .patch(
       '/:uuid',
       requests.createUpdateSchema as Middleware,
-      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getByIdRecords as Middleware,
       controller.updateOne as unknown as Middleware
     )
     .delete(
       '/:uuid',
-      authenticated as Middleware,
       access.isSelfOrAdmin as Middleware,
       records.getByIdRecords as Middleware,
       controller.deleteOne as unknown as Middleware
