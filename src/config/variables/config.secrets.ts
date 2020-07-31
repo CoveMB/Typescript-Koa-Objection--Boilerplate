@@ -18,6 +18,7 @@ const envSchema = joi
     SENTRY_ENVIRONMENT: joi.string()
       .allow('')
       .optional(),
+    SERVICE_CONSUMER_TOKEN: joi.string().required(),
   })
   .unknown()
   .required();
@@ -38,3 +39,4 @@ export const sendGridSecret = envVars.SENDGRID_SECRET;
 export const sentryDNS = envVars.SENTRY_DNS;
 export const sentryEnv = envVars.SENTRY_ENVIRONMENT;
 export const emailFrom = envVars.EMAIL_FROM;
+export const serviceConsumerToken = envVars.SERVICE_CONSUMER_TOKEN;

@@ -7,10 +7,10 @@ content-type: application/json
 Authorization: Bearer {{$dotenv USER_TOKEN }}
 
 ### GET user (one)
-GET {{baseUrl}}/{{version}}/users/52
+GET {{baseUrl}}/{{version}}/users/127dbbaf-4a0f-48b1-879f-330d6b027357
 Accept: */*
 content-type: application/json
-Authorization: Bearer {{$dotenv USER_TOKEN }}
+Authorization: Bearer {{$dotenv ADMIN_TOKEN }}
 
 ### GET user (profile)
 GET {{baseUrl}}/{{version}}/users/profile
@@ -22,15 +22,18 @@ Authorization: Bearer {{$dotenv USER_TOKEN }}
 POST {{baseUrl}}/{{version}}/users
 Accept: */*
 content-type: application/json
+Authorization: Bearer {{$dotenv SERVICE_CONSUMER_TOKEN}}
 
 {
-    "email": "user8email.com"
+    "email": "users@email.com",
+    "password": "isUser@2000"
 }
 
 ### POST users (create) Admin
 POST {{baseUrl}}/{{version}}/users
 Accept: */*
 content-type: application/json
+Authorization: Bearer {{$dotenv SERVICE_CONSUMER_TOKEN}}
 
 {
     "email": "admin@email.com",
@@ -42,7 +45,7 @@ content-type: application/json
 PATCH {{baseUrl}}/{{version}}/users/1
 Accept: */*
 content-type: application/json
-Authorization: Bearer {{$dotenv USER_TOKEN }}
+Authorization: Bearer {{$dotenv ADMIN_TOKEN }}
 
 {
     "email": "user@email.com",

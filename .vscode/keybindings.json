@@ -1,7 +1,0 @@
-[
-  {
-    "key": "ctrl+shift+x",
-    "command": "editor.action.goToTypeDefinition",
-    "when": "editorTextFocus && !editorReadonly"
-  }
-]

@@ -3,6 +3,7 @@ import { ValidationError } from 'config/errors/error.types';
 import configServer from 'config/server';
 import { User } from 'models';
 import requestSetUp from 'supertest';
+import { serviceConsumerToken } from 'config/variables';
 import { getFreshToken, getUserData } from './fixtures/helper';
 import { setUpDb, tearDownDb } from './fixtures/setup';
 
@@ -21,6 +22,7 @@ test('Should sign up new user, sending new token by email', async () => {
   // Create user
   const response = await request
     .post('/api/v1/users')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(newUser);
 
   // Query the new user
@@ -56,6 +58,7 @@ test('Should update user', async () => {
   // Create user
   await request
     .post('/api/v1/users')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(newUser);
 
   // Query the new user
@@ -91,15 +94,15 @@ test('Should not update user if invalid field is sent', async () => {
   const { id } = getUserData();
 
   // Get fresh token
-  const token = await getFreshToken(request);
+  const { token } = await getFreshToken(request);
 
   // Send request with invalid field
   const response = await request
     .patch(`/api/v1/users/${id}`)
+    .set('Authorization', `Bearer ${token}`)
     .send({
       'favorite-color': 'purple'
-    })
-    .set('Authorization', `Bearer ${token}`);
+    });
 
   // A validation error is triggered
   expect(response.status).toBe(422);
@@ -116,6 +119,7 @@ test('Should delete user', async () => {
   // Create user
   await request
     .post('/api/v1/users')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(newUser);
 
   // Query the new user

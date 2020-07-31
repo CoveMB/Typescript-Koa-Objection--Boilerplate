@@ -13,9 +13,9 @@
       "token": "{{$shared prodToken}}",
     },
     "production": {
-      "baseUrl": "https://mvp.tooly.ai/api",
-      "host": "mvp.tooly.ai",
+      "baseUrl": "https://website/api",
       "version": "v1",
+      "host": "website",
       "token": "{{$shared prodToken}}",
     }
   }

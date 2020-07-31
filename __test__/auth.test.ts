@@ -4,6 +4,7 @@ import { NotAuthenticatedError } from 'config/errors/error.types';
 import configServer from 'config/server';
 import { Token, User } from 'models';
 import requestSetUp from 'supertest';
+import { serviceConsumerToken } from 'config/variables';
 import { getFreshToken, getUserData } from './fixtures/helper';
 import { setUpDb, tearDownDb } from './fixtures/setup';
 
@@ -21,6 +22,7 @@ test('Should login user with correct authentication dont return plain password',
   // Logging request
   const response = await request
     .post('/api/v1/login')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(credentials);
 
   const userDb = await User.query()
@@ -44,6 +46,7 @@ test('Should generate fresh valid 6 month token on logging', async () => {
   // Logging request
   const response = await request
     .post('/api/v1/login')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(credentials);
 
   // Get the generated token from database
@@ -71,6 +74,7 @@ test('Should not login user with wrong password', async () => {
   // Logging attempt
   const response = await request
     .post('/api/v1/login')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({
       email, password: `wong${password}`
     });
@@ -234,6 +238,7 @@ test('Should request a password reset generating a temporary 1h valid token', as
   // Request a password reset
   const response = await request
     .post('/api/v1/request-password-reset')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({
       email
     });
@@ -268,6 +273,7 @@ test('Should reset the password of user and make it unable to log with old passw
   // Request a password reset
   await request
     .post('/api/v1/request-password-reset')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({
       email
     });
@@ -282,6 +288,7 @@ test('Should reset the password of user and make it unable to log with old passw
   // Actually reset the password with last token of the user
   const response = await request
     .post('/api/v1/set-password')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({
       password: `${password}2`
     })
@@ -290,11 +297,13 @@ test('Should reset the password of user and make it unable to log with old passw
   // Try login with old password
   const responseOldPassword = await request
     .post('/api/v1/login')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(credentials);
 
   // Try login with new password
   const responseNewPassword = await request
     .post('/api/v1/login')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({
       email, password: `${password}2`
     });
@@ -319,11 +328,13 @@ test('Should reset the password and generate a fresh token and revoke all other 
   // Create an extra token
   await request
     .post('/api/v1/login')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(credentials);
 
   // Request a password reset
   await request
     .post('/api/v1/request-password-reset')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({
       email
     });

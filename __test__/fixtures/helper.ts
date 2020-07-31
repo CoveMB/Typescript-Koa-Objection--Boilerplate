@@ -1,5 +1,6 @@
 import { User } from 'models';
 import { SuperTest, Test } from 'supertest';
+import { serviceConsumerToken } from 'config/variables';
 
 type TestUser = {
   credentials: {
@@ -31,6 +32,7 @@ const getFreshToken = async (request: SuperTest<Test>): Promise<{
 
   await request
     .post('/api/v1/login')
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({ ...credentials });
 
   const user = await User.query()
