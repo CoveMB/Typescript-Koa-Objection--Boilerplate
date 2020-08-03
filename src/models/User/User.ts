@@ -90,6 +90,12 @@ export default class User extends BaseModel {
   // This hook triggers before an insert
   async $beforeInsert(queryContext: QueryContext): Promise<void> {
 
+    if (this.email) {
+
+      this.email = this.email.toLowerCase();
+
+    }
+
     // Validate before password hashing
     validateUserInput(this);
 
@@ -100,6 +106,12 @@ export default class User extends BaseModel {
 
   // This hook triggers before an update
   async $beforeUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<void> {
+
+    if (this.email) {
+
+      this.email = this.email.toLowerCase();
+
+    }
 
     // Validate before password hashing
     validateUserInput(this);
