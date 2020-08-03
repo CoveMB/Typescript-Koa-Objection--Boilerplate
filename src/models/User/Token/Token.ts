@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 import BaseModel from 'models/BaseModel';
 import User from 'models/User/User';
-import { Modifiers, RelationMappings } from 'objection';
+import { Modifiers, RelationMappings, QueryBuilder } from 'objection';
 import TokenQueryBuilder from './token.queries';
 
 export default class Token extends BaseModel {
@@ -54,14 +54,13 @@ export default class Token extends BaseModel {
     },
   });
 
-  // Modifiers are reusable query snippets that can be used in various places.
   static modifiers: Modifiers = {
 
     // Get modifiers from base class
     ...BaseModel.modifiers,
 
     // This modifier control the data that can be accessed depending of the authenticated user
-    graphQLAccessControl(builder, user) {
+    graphQLAccessControl(builder: QueryBuilder<Token>, user: User) {
 
       // Only the tokens from the authenticated user should be accessible
       builder.where('userId', user.id);
