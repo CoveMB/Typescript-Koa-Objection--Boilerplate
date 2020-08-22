@@ -10,10 +10,10 @@ export const loginRecords = async (
 
   try {
 
-    const { validatedRequest } = ctx;
+    const { validatedRequest: credentials } = ctx;
 
     // Find the user from the send credentials
-    const user = await User.query().findByCredentials(validatedRequest);
+    const user = await User.query().findByCredentials(credentials);
 
     ctx.records = { user };
 
@@ -34,10 +34,10 @@ export const requestResetPasswordRecords = async (
 
   try {
 
-    const { validatedRequest } = ctx;
+    const { validatedRequest: email } = ctx;
 
     // Find the user from the email
-    const user = await User.query().findOne(validatedRequest);
+    const user = await User.query().findOne(email);
 
     // Validate that a user was found
     validateFoundInstances([
@@ -66,17 +66,17 @@ export const registerThirdPartyRecords = async (
 
   try {
 
-    const { validatedRequest } = ctx;
+    const { validatedRequest: userInfo } = ctx;
 
     // Find existing user with email or create it
     const user = await User
       .query()
-      .findOrCreate({ email: validatedRequest.user.email });
+      .findOrCreate({ email: userInfo.user.email });
 
     // Validate that a user was found
     validateFoundInstances([
       {
-        instance: user, type: 'User', search: validatedRequest.user.email as string
+        instance: user, type: 'User', search: userInfo.user.email as string
       }
     ]);
 

@@ -3,8 +3,6 @@ import { UserAgentContext } from 'koa-useragent';
 import { Token, User } from 'models';
 import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
 import { AuthenticatedContext } from 'types';
-import { PartialModelObject } from 'objection';
-import { getDevice } from 'utils';
 
 export const logIn = async (
   ctx: Context & WithRecords<{user: User}> & UserAgentContext
@@ -12,8 +10,7 @@ export const logIn = async (
 
   try {
 
-    const { userAgent, records } = ctx;
-    const { user } = records;
+    const { userAgent, records: { user } } = ctx;
 
     // Generate JWT token for authentication
     const token = await Token.query()
@@ -104,8 +101,7 @@ export const requestResetPassword = async (
 
   try {
 
-    const { userAgent, records } = ctx;
-    const { user } = records;
+    const { userAgent, records: { user } } = ctx;
 
     // Generate JWT token for to send to the email to able password reset
     const temporary = true;
@@ -132,12 +128,11 @@ export const setPassword = async (
 
   try {
 
-    const { validatedRequest, userAgent, authenticated } = ctx;
-    const { user } = authenticated;
+    const { validatedRequest: password, userAgent, authenticated: { user } } = ctx;
 
     // Update the user
     await user.$query()
-      .patch(validatedRequest);
+      .patch(password);
 
     // Revoke other tokens
     await Token.query()
@@ -170,8 +165,7 @@ export const registerThirdParty = async (
 
   try {
 
-    const { validatedRequest, records, userAgent } = ctx;
-    const { user } = records;
+    const { validatedRequest, records: { user }, userAgent } = ctx;
 
     // Update with latest google info
     const updatedUser = await user.$query()

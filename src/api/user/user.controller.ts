@@ -2,6 +2,7 @@ import { Context } from 'koa';
 import { Token, User } from 'models';
 import { sendConfirmationEmail } from 'models/User/Token/token.emails';
 import { AuthenticatedContext } from 'types';
+import { userInfo } from 'os';
 
 // The user the the parameter comes from the authenticated middleware
 export const getProfile = async (
@@ -74,10 +75,10 @@ export const createOne = async (ctx: Context): Promise<void> => {
 
   try {
 
-    const { validatedRequest, userAgent } = ctx;
+    const { validatedRequest: userData, userAgent } = ctx;
 
     // Create new user
-    const user = await User.query().insert(validatedRequest);
+    const user = await User.query().insert(userData);
 
     // Generate JWT token for the new user
     const temporary = true;
@@ -108,8 +109,7 @@ export const updateOne = async (
   try {
 
     // The user has been fetch in the records middleware
-    const { validatedRequest } = ctx;
-    const { user } = ctx.records;
+    const { validatedRequest, record: { user } } = ctx;
 
     // Update the user
     const updatedUser = await user.$query()
