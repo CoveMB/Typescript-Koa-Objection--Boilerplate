@@ -1,13 +1,15 @@
 import appRoot from 'app-root-path';
 import winston from 'winston';
 import Sentry from 'winston-sentry-log';
-import { isDevelopment, sentryDNS, sentryEnv } from './variables';
+import {
+  isDevelopment, sentryDNS, sentryEnv, appName
+} from './variables';
 
 // Base logger
 const logger = winston.createLogger({
   level      : 'info',
   format     : winston.format.json(),
-  defaultMeta: { service: 'api-service' },
+  defaultMeta: { service: `api-service-${appName}` },
 });
 
 // Log to the console
