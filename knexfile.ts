@@ -1,12 +1,13 @@
 /* eslint-disable import/first */
 import { addPath } from 'app-module-path';
+
+addPath(`${__dirname}/src`);
+
 import { ConfigError } from 'config/errors/error.types';
 import {
   dbHost, dbName, dbPassword, dbPort, dbUser
 } from 'config/variables';
 import { knexSnakeCaseMappers } from 'objection';
-
-addPath(`${__dirname}/src`);
 
 const getKnexConfig = (configType: 'production' | 'test' = 'production') => {
 

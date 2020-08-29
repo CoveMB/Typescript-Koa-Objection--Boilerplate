@@ -1,8 +1,6 @@
 /* eslint-disable max-classes-per-file */
 // Hidden errors //
 
-import { ValidationErrorItem } from '@hapi/joi';
-
 class ConfigError extends Error {
 
   message!: string;
