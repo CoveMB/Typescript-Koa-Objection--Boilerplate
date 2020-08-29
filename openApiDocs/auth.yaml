@@ -1,0 +1,366 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+servers:
+  - description: Auth API
+    url: https://virtserver.swaggerhub.com/BenjaminMarquis/Authentication/1.0.0
+info:
+  description: Auth API
+  version: "1.0.0"
+  title: Auth API
+  
+security:
+  - BearerAuth: []
+  
+paths:
+  
+  /login:
+    post:
+      summary: login users
+      operationId: login
+      description: login a user with it's credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: user logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    $ref: '#/components/schemas/Token'
+        '401':
+          description: Could not login user
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref : '#/components/responses/401NotAuthenticated'
+                  - $ref : '#/components/responses/401LoginError'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+      
+  
+  /logout:
+    post:
+      summary: logout a user
+      operationId: logout
+      description: logout a user by the given token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          $ref : '#/components/responses/200Success'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+          
+  /logout-all:
+    post:
+      summary: logout all tokens
+      operationId: logoutAll
+      description: logout all tokens of a user
+      responses:
+        '200':
+          $ref : '#/components/responses/200Success'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  
+  /check-token:
+    post:
+      summary: check a token
+      operationId: checkToken
+      description: check the validity of a token
+      responses:
+        '200':
+          $ref : '#/components/responses/200Success'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  
+  /request-password-reset:
+    post:
+      summary: request a password reset
+      operationId: requestPasswordReset
+      description: will request a link to reset the password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestPasswordResetRequest'
+      responses:
+        '200':
+          $ref : '#/components/responses/200Success'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /set-password:
+    post:
+      summary: set a new password
+      operationId: setPassword
+      description: will change the user's password and log him/her in
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+      responses:
+        '200':
+          description: user logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    $ref: '#/components/schemas/Token'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+          
+  /register-third-party:
+    post:
+      summary: third party login
+      operationId: registerThirdParty
+      description: register a new user through a third party login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterThirdPartyRequest'
+      responses:
+        '200':
+          description: user logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    $ref: '#/components/schemas/Token'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  
+components:
+  
+  schemas:
+  
+    RegisterThirdPartyRequest:
+      description: register third party payload
+      type: object
+      required:
+       - user
+      properties:
+        user:
+          type: object
+          required:
+           - email
+          properties:
+            email:
+              type: string
+              format: email
+              example: example@email.com
+            name:
+              type: string
+              example: Manuel
+            profilePicture:
+              type: string
+              format: http
+              example: http://provider.com/avatarurl.png
+            googleId:
+              type: string
+              example: "kuybyu9876"
+    
+    SetPasswordRequest:
+      description: password set payload
+      type: object
+      required:
+       - password
+      properties:
+        password:
+          type: string
+          example: Password23
+  
+    RequestPasswordResetRequest:
+      description: password reset payload
+      type: object
+      required:
+       - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: example@email.com
+    
+    
+    LoginRequest:
+      description: login payload
+      type: object
+      required:
+       - email
+       - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: example@email.com
+        password:
+          type: string
+          example: Password23
+   
+    LogoutRequest:
+      description: logout payload
+      type: object
+      required:
+        - token
+      properties:
+        token:
+            type: string
+            format: token
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+  eyJpc3MiOiJ0b3B0YWwuY29tIiwiZXhwIjoxNDI2NDIwODAwLC"
+   
+   
+    User:
+      type: object
+      required:
+       - email
+       - uuid
+      properties:
+        email:
+          type: string
+          format: email
+          example: example@email.com
+        uuid:
+          type: string
+          format: uuid
+          example: 'ed8d3abc-2d91-4c81-a680-0ac662e0f5ab'
+        name:
+          type: string
+          example: "Joana"
+        googleID:
+          type: string
+          example: "sds908J"
+    
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+          format: token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJpc3MiOiJ0b3B0YWwuY29tIiwiZXhwIjoxNDI2NDIwODAwLC"
+        expiration:
+          type: string
+          format: date
+          example: "2021-03-01T14:38:35.343Z"
+
+    Error:
+      type: object
+      required:
+        - status
+        - error
+        - message
+      properties:
+        status:
+          type: integer
+          example: "failed"
+        error:
+          type: string
+          example: 'ActionError'
+        message:
+          type: string
+          example: 'something went wrong with your action'
+  
+  responses:
+  
+    200Success:
+      description: Simple success feedback
+      content:
+        application/json:
+          schema:
+            properties:
+              status: 
+                type: string
+                example: "success"
+    
+    404NotFound:
+      description: The ressource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    401NotAuthenticated:
+      description: Not able to authenticate the bearer token
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - error
+              - message
+            example:
+              status: 'failed'
+              error: 'NotAuthenticatedError'
+              message: 'You need to be authenticated to perform this action'
+    
+    401LoginError:
+      description: Not able to login with given credentials
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - error
+              - message
+            example:
+              status: 'failed'
+              error: 'LoginError'
+              message: 'Unable to login'
+    
+    500ServerError:
+      description: The server encountered an error
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - error
+              - message
+            example:
+              status: "failed"
+              error: 'ServerError'
+              message: 'Internal server error'
+              
+  
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

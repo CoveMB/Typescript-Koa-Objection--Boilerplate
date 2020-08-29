@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 // Hidden errors //
 
-class ConfigError extends Error {
+export class ConfigError extends Error {
 
   message!: string;
   name!: string;
@@ -21,7 +21,7 @@ class ConfigError extends Error {
 
 }
 
-class QueryError extends Error {
+export class QueryError extends Error {
 
   message!: string;
   name!: string;
@@ -41,7 +41,7 @@ class QueryError extends Error {
 
 }
 
-class ImplementationMissingError extends Error {
+export class ImplementationMissingError extends Error {
 
   message!: string;
   name!: string;
@@ -61,7 +61,7 @@ class ImplementationMissingError extends Error {
 
 }
 
-class EmailNotSentError extends Error {
+export class EmailNotSentError extends Error {
 
   message!: string;
   name!: string;
@@ -81,7 +81,7 @@ class EmailNotSentError extends Error {
 
 }
 
-class ThirdPartyError extends Error {
+export class ThirdPartyError extends Error {
 
   message!: string;
   name!: string;
@@ -103,7 +103,7 @@ class ThirdPartyError extends Error {
 
 // Exposed errors //
 
-class NotFoundError extends Error {
+export class NotFoundError extends Error {
 
   message!: string;
   name!: string;
@@ -123,7 +123,7 @@ class NotFoundError extends Error {
 
 }
 
-class LoginError extends Error {
+export class LoginError extends Error {
 
   message!: string;
   name!: string;
@@ -143,7 +143,7 @@ class LoginError extends Error {
 
 }
 
-class NotAuthenticatedError extends Error {
+export class NotAuthenticatedError extends Error {
 
   message!: string;
   name!: string;
@@ -163,7 +163,7 @@ class NotAuthenticatedError extends Error {
 
 }
 
-class ExpiredTokenError extends Error {
+export class ExpiredTokenError extends Error {
 
   message!: string;
   name!: string;
@@ -183,7 +183,7 @@ class ExpiredTokenError extends Error {
 
 }
 
-class ValidationError extends Error {
+export class ValidationError extends Error {
 
   message!: string;
   name!: string;
@@ -203,7 +203,7 @@ class ValidationError extends Error {
 
 }
 
-class NotAuthorizeError extends Error {
+export class NotAuthorizeError extends Error {
 
   message!: string;
   name!: string;
@@ -222,17 +222,3 @@ class NotAuthorizeError extends Error {
   }
 
 }
-
-export {
-  ExpiredTokenError,
-  ValidationError,
-  NotFoundError,
-  LoginError,
-  NotAuthenticatedError,
-  NotAuthorizeError,
-  EmailNotSentError,
-  ConfigError,
-  QueryError,
-  ThirdPartyError,
-  ImplementationMissingError
-};
