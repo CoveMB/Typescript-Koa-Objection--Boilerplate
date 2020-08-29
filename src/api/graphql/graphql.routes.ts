@@ -3,7 +3,7 @@ import Router from 'koa-router';
 import * as controller from './graphql.controller';
 import * as requests from './middlewares/graphql.requests';
 
-const graphqlSubRouter = () => {
+export const graphqlSubRouter = () => {
 
   const router = new Router({
     prefix: '/graphql',
@@ -19,5 +19,3 @@ const graphqlSubRouter = () => {
   return router.routes();
 
 };
-
-export default graphqlSubRouter;

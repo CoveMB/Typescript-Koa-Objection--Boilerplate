@@ -6,7 +6,7 @@ import * as records from './middlewares/user.records';
 import * as requests from './middlewares/user.requests';
 import * as controller from './user.controller';
 
-const userSubRouter = () => {
+export const userSubRouter = () => {
 
   const router = new Router({
     prefix: '/users',
@@ -51,5 +51,3 @@ const userSubRouter = () => {
   return router.routes();
 
 };
-
-export default userSubRouter;

@@ -4,7 +4,7 @@ import * as controller from './auth.controller';
 import * as records from './middlewares/auth.records';
 import * as requests from './middlewares/auth.requests';
 
-const authSubRouter = () => {
+export const authSubRouter = () => {
 
   const router = new Router();
 
@@ -51,5 +51,3 @@ const authSubRouter = () => {
   return router.routes();
 
 };
-
-export default authSubRouter;

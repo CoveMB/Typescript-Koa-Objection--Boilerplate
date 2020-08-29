@@ -2,7 +2,6 @@ import { Context } from 'koa';
 import { Token, User } from 'models';
 import { sendConfirmationEmail } from 'models/User/Token/token.emails';
 import { AuthenticatedContext } from 'types';
-import { userInfo } from 'os';
 
 // The user the the parameter comes from the authenticated middleware
 export const getProfile = async (
