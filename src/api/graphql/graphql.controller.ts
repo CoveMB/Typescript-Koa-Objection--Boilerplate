@@ -1,16 +1,13 @@
 import { ImplementationMissingError } from 'config/errors/error.types';
 import graphQlSchema from 'config/graphql';
 import { isDevelopment } from 'config/variables';
-import { Next } from 'koa';
 import graphqlHTTP from 'koa-graphql';
 import { Model, QueryBuilder } from 'objection';
-import { AuthenticatedContext } from 'types';
+import { StatefulMiddleware } from 'types';
+import { GQLQueryRequest } from './middlewares/graphql.requests';
 
 // All graphQL queries are handled by graphqlHTTP
-export const graphql = async (
-  ctx: AuthenticatedContext & WithValidatedRequest<{query: string}>,
-  next: Next
-): Promise<void> => graphqlHTTP({
+export const graphql: StatefulMiddleware<GQLQueryRequest> = async (ctx, next) => graphqlHTTP({
   schema     : graphQlSchema,
   graphiql   : isDevelopment, // Will activate graphiql only in during development
   formatError: (error: Error) => {
@@ -34,7 +31,7 @@ export const graphql = async (
         runBefore(_: Model | Model[], builder: QueryBuilder<Model>) {
 
           // We get the authenticated user from the context (cf authenticated middleware)
-          const { user } = ctx.authenticated;
+          const { user } = ctx.state.authenticated;
 
           try {
 

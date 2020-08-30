@@ -38,7 +38,7 @@ const bootstrap = async (): Promise<void> => {
 
     await bootstrap();
 
-    logger.info(`🛩  ${appName} is listening on port ${port}, let's play!`);
+    logger.info(`🔑 ${appName} is listening on port ${port}, let's play!`);
 
   } catch (error) {
 

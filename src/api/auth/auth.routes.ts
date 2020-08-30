@@ -13,17 +13,17 @@ export const authSubRouter = () => {
       '/login',
       requests.loginSchema as Middleware,
       records.loginRecords as Middleware,
-      controller.logIn as unknown as Middleware
+      controller.logIn as Middleware
     )
     .post(
       '/logout',
       requests.logoutSchema as Middleware,
-      controller.logOut as unknown as Middleware
+      controller.logOut as Middleware
     )
     .post(
       '/logout-all',
       requests.logoutAllSchema as Middleware,
-      controller.logOutAll as unknown as Middleware
+      controller.logOutAll as Middleware
     )
     .post(
       '/check-token',
@@ -33,18 +33,18 @@ export const authSubRouter = () => {
       '/request-password-reset',
       requests.requestResetPasswordSchema as Middleware,
       records.requestResetPasswordRecords as Middleware,
-      controller.requestResetPassword as unknown as Middleware
+      controller.requestResetPassword as Middleware
     )
     .post(
       '/set-password',
       requests.setPasswordSchema as Middleware,
-      controller.setPassword as unknown as Middleware
+      controller.setPassword as Middleware
     )
     .post(
       '/register-third-party',
       requests.registerThirdPartySchema as Middleware,
       records.registerThirdPartyRecords as Middleware,
-      controller.registerThirdParty as unknown as Middleware
+      controller.registerThirdParty as Middleware
 
     );
 

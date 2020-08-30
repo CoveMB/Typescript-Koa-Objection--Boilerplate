@@ -24,6 +24,9 @@ export async function up(knex: Knex): Promise<void> {
         .nullable();
       table.string('name')
         .nullable();
+      table.string('profile_picture')
+        .unique()
+        .nullable();
       table.string('google_id')
         .unique()
         .nullable();

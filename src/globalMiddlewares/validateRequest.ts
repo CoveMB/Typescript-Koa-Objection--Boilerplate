@@ -12,7 +12,7 @@ const validateRequest = (
 
     await schema.validateAsync(toValidate);
 
-    ctx.validatedRequest = toValidate;
+    ctx.state.validatedRequest = toValidate;
 
   } catch (error) {
 

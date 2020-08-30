@@ -1,16 +1,14 @@
-import { Context } from 'koa';
-import { UserAgentContext } from 'koa-useragent';
-import { Token, User } from 'models';
+import { Token } from 'models';
 import { sendResetPasswordEmail } from 'models/User/Token/token.emails';
-import { AuthenticatedContext } from 'types';
+import { StatefulMiddleware } from 'types';
+import { LogoutRequest, SetPasswordRequest, RegisterThirdPartyRequest } from './middlewares/auth.requests';
+import { LoginRecords, RequestResetPasswordRecords, RegisterThirdPartyRecords } from './middlewares/auth.records';
 
-export const logIn = async (
-  ctx: Context & WithRecords<{user: User}> & UserAgentContext
-): Promise<void> => {
+export const logIn: StatefulMiddleware<LoginRecords> = async ctx => {
 
   try {
 
-    const { userAgent, records: { user } } = ctx;
+    const { userAgent, state: { records: { user } } } = ctx;
 
     // Generate JWT token for authentication
     const token = await Token.query()
@@ -30,14 +28,12 @@ export const logIn = async (
 };
 
 // The user the the parameter comes back from the authenticated middleware
-export const logOut = async (
-  ctx: Context & WithValidatedRequest<{token: string}>
-): Promise<void> => {
+export const logOut: StatefulMiddleware<LogoutRequest> = async ctx => {
 
   try {
 
     // The authenticated middleware attache the user that made the request to the context
-    const { token } = ctx.validatedRequest;
+    const { validatedRequest: { token } } = ctx.state;
 
     await Token.query().revokeAuthToken(token);
 
@@ -54,14 +50,12 @@ export const logOut = async (
 };
 
 // The user the the parameter comes back from the authenticated middleware
-export const logOutAll = async (
-  ctx: AuthenticatedContext
-): Promise<void> => {
+export const logOutAll: StatefulMiddleware = async ctx => {
 
   try {
 
     // The authenticated middleware attache the user that made the request to the context
-    const { user } = ctx.authenticated;
+    const { user } = ctx.state.authenticated;
 
     await Token.query().revokeAllAuthTokens(user);
 
@@ -78,7 +72,7 @@ export const logOutAll = async (
 };
 
 // Check if the token sent is still valid
-export const checkToken = async (ctx: Context): Promise<void> => {
+export const checkToken: StatefulMiddleware = async ctx => {
 
   try {
 
@@ -95,13 +89,11 @@ export const checkToken = async (ctx: Context): Promise<void> => {
 
 };
 
-export const requestResetPassword = async (
-  ctx: Context & WithRecords<{user: User}> & UserAgentContext
-): Promise<void> => {
+export const requestResetPassword: StatefulMiddleware<RequestResetPasswordRecords> = async ctx => {
 
   try {
 
-    const { userAgent, records: { user } } = ctx;
+    const { userAgent, state: { records: { user } } } = ctx;
 
     // Generate JWT token for to send to the email to able password reset
     const temporary = true;
@@ -122,17 +114,15 @@ export const requestResetPassword = async (
 
 };
 
-export const setPassword = async (
-  ctx: AuthenticatedContext & WithValidatedRequest<{password: string}> & UserAgentContext
-): Promise<void> => {
+export const setPassword: StatefulMiddleware<SetPasswordRequest> = async ctx => {
 
   try {
 
-    const { validatedRequest: password, userAgent, authenticated: { user } } = ctx;
+    const { state: { validatedRequest: credentials, authenticated: { user } }, userAgent } = ctx;
 
     // Update the user
     await user.$query()
-      .patch(password);
+      .patch(credentials);
 
     // Revoke other tokens
     await Token.query()
@@ -156,16 +146,11 @@ export const setPassword = async (
 
 };
 
-export const registerThirdParty = async (
-  ctx: Context &
-  WithRecords<{
-    user: User
-  }> & UserAgentContext
-): Promise<void> => {
+export const registerThirdParty: StatefulMiddleware<RegisterThirdPartyRecords & RegisterThirdPartyRequest> = async ctx => {
 
   try {
 
-    const { validatedRequest, records: { user }, userAgent } = ctx;
+    const { state: { validatedRequest, records: { user } }, userAgent } = ctx;
 
     // Update with latest google info
     const updatedUser = await user.$query()

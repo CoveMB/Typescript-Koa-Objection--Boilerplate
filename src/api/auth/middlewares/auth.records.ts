@@ -1,21 +1,24 @@
-import { Context, Next } from 'koa';
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
-import { PartialModelObject } from 'objection';
+import { RecordsSchema, StatefulMiddleware } from 'types';
+import { RequestResetPasswordRequest, RegisterThirdPartyRequest, LoginRequest } from './auth.requests';
 
-export const loginRecords = async (
-  ctx: Context & WithValidatedRequest<Credentials>,
-  next: Next
-): Promise<void> => {
+// Login
+export type LoginRecords = RecordsSchema<{
+  user: User
+}>;
+
+export const loginRecords: StatefulMiddleware<LoginRequest> = async (ctx, next
+) => {
 
   try {
 
-    const { validatedRequest: credentials } = ctx;
+    const { validatedRequest : credentials } = ctx.state;
 
     // Find the user from the send credentials
     const user = await User.query().findByCredentials(credentials);
 
-    ctx.records = { user };
+    ctx.state.records = { user };
 
   } catch (error) {
 
@@ -27,17 +30,19 @@ export const loginRecords = async (
 
 };
 
-export const requestResetPasswordRecords = async (
-  ctx: Context & WithValidatedRequest<{email: string}>,
-  next: Next
-): Promise<void> => {
+// Request reset Password
+export type RequestResetPasswordRecords = RecordsSchema<{
+  user: User
+}>;
+
+export const requestResetPasswordRecords: StatefulMiddleware<RequestResetPasswordRequest> = async (ctx, next) => {
 
   try {
 
-    const { validatedRequest: email } = ctx;
+    const { validatedRequest: credentials } = ctx.state;
 
     // Find the user from the email
-    const user = await User.query().findOne(email);
+    const user = await User.query().findOne(credentials);
 
     // Validate that a user was found
     validateFoundInstances([
@@ -47,7 +52,7 @@ export const requestResetPasswordRecords = async (
     ]);
 
     // Attach it to the context
-    ctx.records = { user };
+    ctx.state.records = { user };
 
   } catch (error) {
 
@@ -59,14 +64,16 @@ export const requestResetPasswordRecords = async (
 
 };
 
-export const registerThirdPartyRecords = async (
-  ctx: Context & WithValidatedRequest<{user: PartialModelObject<User>}>,
-  next: Next
-): Promise<void> => {
+// Register third party
+export type RegisterThirdPartyRecords = RecordsSchema<{
+  user: User
+}>;
+
+export const registerThirdPartyRecords: StatefulMiddleware<RegisterThirdPartyRequest> = async (ctx, next) => {
 
   try {
 
-    const { validatedRequest: userInfo } = ctx;
+    const { validatedRequest: userInfo } = ctx.state;
 
     // Find existing user with email or create it
     const user = await User
@@ -81,7 +88,7 @@ export const registerThirdPartyRecords = async (
     ]);
 
     // Attach it to the context
-    ctx.records = { user };
+    ctx.state.records = { user };
 
   } catch (error) {
 

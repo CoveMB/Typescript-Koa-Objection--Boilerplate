@@ -33,7 +33,7 @@ const authenticated = async (ctx: Context, next: Next): Promise<void> => {
     }
 
     // Attach the found user and current token to the response
-    ctx.authenticated = {
+    ctx.state.authenticated = {
       user: foundToken.user, token
     };
 

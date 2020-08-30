@@ -1,17 +1,16 @@
-import { Context } from 'koa';
 import { Token, User } from 'models';
 import { sendConfirmationEmail } from 'models/User/Token/token.emails';
-import { AuthenticatedContext } from 'types';
+import { StatefulMiddleware } from 'types';
+import { CreateUpdateUserRequest } from './middlewares/user.requests';
+import { GetUserByIdRecords, GetAllUserRecords } from './middlewares/user.records';
 
 // The user the the parameter comes from the authenticated middleware
-export const getProfile = async (
-  ctx: AuthenticatedContext
-): Promise<void> => {
+export const getProfile: StatefulMiddleware<GetUserByIdRecords> = async ctx => {
 
   try {
 
     // The authenticated middleware attache the user that made the request to the context
-    const { user } = ctx.authenticated;
+    const { user } = ctx.state.authenticated;
 
     ctx.body = {
       status: 'success',
@@ -27,14 +26,12 @@ export const getProfile = async (
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const getOne = async (
-  ctx: Context & WithRecords<{user: User}>
-): Promise<void> => {
+export const getOne: StatefulMiddleware<GetUserByIdRecords> = async ctx => {
 
   try {
 
     // The user has been fetch in the records middleware
-    const { user } = ctx.records;
+    const { user } = ctx.state.records;
 
     // Send it
     ctx.body = {
@@ -49,14 +46,12 @@ export const getOne = async (
 
 };
 
-export const getAll = async (
-  ctx: Context & WithRecords<{users: User[]}>
-): Promise<void> => {
+export const getAll: StatefulMiddleware<GetAllUserRecords> = async ctx => {
 
   try {
 
     // The users has been fetch in the records middleware
-    const { users } = ctx.records;
+    const { users } = ctx.state.records;
 
     ctx.body = {
       status: 'success', users
@@ -70,11 +65,11 @@ export const getAll = async (
 
 };
 
-export const createOne = async (ctx: Context): Promise<void> => {
+export const createOne: StatefulMiddleware<CreateUpdateUserRequest> = async ctx => {
 
   try {
 
-    const { validatedRequest: userData, userAgent } = ctx;
+    const { state: { validatedRequest: userData }, userAgent } = ctx;
 
     // Create new user
     const user = await User.query().insert(userData);
@@ -101,14 +96,12 @@ export const createOne = async (ctx: Context): Promise<void> => {
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const updateOne = async (
-  ctx: Context & WithRecords<{user: User}> & WithValidatedRequest<{email: string, password: string}>
-): Promise<void> => {
+export const updateOne: StatefulMiddleware<CreateUpdateUserRequest & GetUserByIdRecords> = async ctx => {
 
   try {
 
     // The user has been fetch in the records middleware
-    const { validatedRequest, record: { user } } = ctx;
+    const { validatedRequest, records: { user } } = ctx.state;
 
     // Update the user
     const updatedUser = await user.$query()
@@ -128,14 +121,12 @@ export const updateOne = async (
 };
 
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const deleteOne = async (
-  ctx: Context & WithRecords<{user: User}>
-): Promise<void> => {
+export const deleteOne: StatefulMiddleware<GetUserByIdRecords> = async ctx => {
 
   try {
 
     // Get user from records middleware
-    const { user } = ctx.records;
+    const { user } = ctx.state.records;
 
     // Delete him/her
     await User.query().deleteById(user.id);

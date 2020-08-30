@@ -28,6 +28,8 @@ export default class User extends BaseModel {
   email!: string;
   password!: string;
   admin!: boolean;
+  profilePicture?: string;
+  googleId?: string;
 
   // Needed until objection-password add types
   verifyPassword?: (password: string) => Promise<boolean>;
@@ -58,6 +60,12 @@ export default class User extends BaseModel {
       },
       admin: {
         type: 'boolean'
+      },
+      googleId: {
+        type: 'string'
+      },
+      profilePicture: {
+        type: 'string'
       }
     }
   };

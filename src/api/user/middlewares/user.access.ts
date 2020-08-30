@@ -1,19 +1,15 @@
 import { NotAuthorizeError } from 'config/errors/error.types';
-import { Next } from 'koa';
-import { AuthenticatedContext } from 'types';
+import { StatefulMiddleware } from 'types';
 
-export const isSelfOrAdmin  = async (
-  ctx: AuthenticatedContext,
-  next: Next
-): Promise<void> => {
+export const isSelfOrAdmin: StatefulMiddleware = async (ctx, next) => {
 
   try {
 
-    const { params, authenticated: { user } } = ctx;
+    const { params, state: { authenticated: { user } } } = ctx;
 
     if (user.uuid === params.uuid || user.admin) {
 
-      ctx.requestUuid = params.uuid;
+      ctx.state.requestUuid = params.uuid;
 
     } else {
 

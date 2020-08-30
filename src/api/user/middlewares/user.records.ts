@@ -1,16 +1,17 @@
-import { Next } from 'koa';
 import { User } from 'models';
 import { validateFoundInstances } from 'models/model.utils';
-import { AuthenticatedContext } from 'types';
+import { StatefulMiddleware, WithUuid, RecordsSchema } from 'types';
 
-export const getByIdRecords = async (
-  ctx: AuthenticatedContext & RequestWithUuid,
-  next: Next
-): Promise<void> => {
+// Get by Id
+export type GetUserByIdRecords = RecordsSchema<{
+  user: User
+}>;
+
+export const getByIdRecords: StatefulMiddleware<WithUuid> = async (ctx, next) => {
 
   try {
 
-    const { requestUuid } = ctx;
+    const { requestUuid } = ctx.state;
 
     // Get the user
     const user = await User.query().findByUuid(requestUuid);
@@ -21,7 +22,7 @@ export const getByIdRecords = async (
       }
     ]);
 
-    ctx.records = { user };
+    ctx.state.records = { user };
 
   } catch (error) {
 
@@ -33,17 +34,19 @@ export const getByIdRecords = async (
 
 };
 
-export const getAllRecords =  async (
-  ctx: AuthenticatedContext,
-  next: Next
-): Promise<void> => {
+// Get All Records
+export type GetAllUserRecords = RecordsSchema<{
+  users: User[]
+}>;
+
+export const getAllRecords: StatefulMiddleware =  async (ctx, next) => {
 
   try {
 
     // Get all the users
     const users = await User.query();
 
-    ctx.records = { users };
+    ctx.state.records = { users };
 
   } catch (error) {
 
