@@ -1,3 +1,4 @@
+import { authenticated } from 'globalMiddlewares';
 import { Middleware } from 'koa';
 import Router from 'koa-router';
 import * as controller from './auth.controller';
@@ -9,6 +10,19 @@ export const authSubRouter = () => {
   const router = new Router();
 
   router
+    .get(
+      '/get-csrf',
+      controller.getCsrf as Middleware
+    )
+    .get(
+      '/check-token',
+      controller.checkToken as Middleware
+    )
+    .post(
+      '/register',
+      requests.register as Middleware,
+      controller.register as unknown as Middleware
+    )
     .post(
       '/login',
       requests.loginSchema as Middleware,
@@ -17,17 +31,15 @@ export const authSubRouter = () => {
     )
     .post(
       '/logout',
+      authenticated as Middleware,
       requests.logoutSchema as Middleware,
       controller.logOut as Middleware
     )
-    .post(
+    .delete(
       '/logout-all',
+      authenticated as Middleware,
       requests.logoutAllSchema as Middleware,
       controller.logOutAll as Middleware
-    )
-    .post(
-      '/check-token',
-      controller.checkToken as Middleware
     )
     .post(
       '/request-password-reset',
@@ -35,9 +47,10 @@ export const authSubRouter = () => {
       records.requestResetPasswordRecords as Middleware,
       controller.requestResetPassword as Middleware
     )
-    .post(
+    .patch(
       '/set-password',
       requests.setPasswordSchema as Middleware,
+      records.setPasswordRecords as Middleware,
       controller.setPassword as Middleware
     )
     .post(

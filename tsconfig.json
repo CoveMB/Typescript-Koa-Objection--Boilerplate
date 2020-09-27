@@ -21,10 +21,11 @@
       ]
     },
     "typeRoots": [
-      "src/types",
+      "src/types/*",
       "node_modules/@types"
     ]
   },
+  "compileOnSave": true,
   "exclude": [
     "node_modules",
     "./dist",

@@ -1,17 +1,7 @@
 ############### AUTH ###############
 
-### Login (one) ADMIN
-POST {{baseUrl}}/{{version}}/login
-Accept: */*
-content-type: application/json
-Authorization: Bearer {{$dotenv SERVICE_CONSUMER_TOKEN}}
 
-{
-    "email": "admin@email.com",
-    "password": "isAdmin@2000"
-}
-
-### Login (one) USER
+### Login
 POST {{baseUrl}}/{{version}}/login
 Accept: */*
 content-type: application/json
@@ -22,15 +12,23 @@ Authorization: Bearer {{$dotenv SERVICE_CONSUMER_TOKEN}}
     "password": "isUser@2000"
 }
 
-### Logout (one)
-POST {{baseUrl}}/{{version}}/logout
+### Register new user
+POST {{baseUrl}}/{{version}}/register
 Accept: */*
 content-type: application/json
-Authorization: Bearer {{ $dotenv USER_TOKEN }}
+Authorization: Bearer {{$dotenv SERVICE_CONSUMER_TOKEN}}
+
+{
+    "email": "user@email.com"
+}
+
+### Logout (one)
+DELETE {{baseUrl}}/{{version}}/logout
+Accept: */*
+content-type: application/json
 
 
 ### Logout (all)
-POST {{baseUrl}}/{{version}}/logout-all
+DELETE {{baseUrl}}/{{version}}/logout-all
 Accept: */*
 content-type: application/json
-Authorization: Bearer {{ $dotenv USER_TOKEN }}

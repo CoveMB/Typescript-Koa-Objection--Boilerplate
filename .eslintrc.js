@@ -1,46 +1,46 @@
 module.exports = {
 
-  parserOptions: {
-    ecmaVersion: 10,
-    parser: "@typescript-eslint/parser",
-    project: './tsconfig.json'
+  "parserOptions": {
+    "ecmaVersion": 10,
+    "parser": "@typescript-eslint/parser",
+    "project": './tsconfig.json'
   },
-  extends: 
+  "extends": 
   [
     "plugin:@typescript-eslint/recommended", 
     'airbnb-typescript/base', 
     'koa', 
     'plugin:jest/recommended'
   ],
-  plugins: [
+  "plugins": [
     "@typescript-eslint"
   ],
-  settings: {
+  "settings": {
     'import/resolver':{
-      node:{
-        extensions: ['.js', '.ts'],
-        moduleDirectory: ['node_modules', './src']
+      "node":{
+        "extensions": ['.js', '.ts'],
+        "moduleDirectory": ['node_modules', './src']
       }
     }
   },
   "rules": {
     'import/extensions': ['error', 'ignorePackages', {
-      js: 'never',
-      ts: 'never',
+      'js': 'never',
+      'ts': 'never',
     }],
-    "no-cycle": "off",
+    "import/no-cycle": "off",
     // Typescript
     "@typescript-eslint/lines-between-class-members": ["warn", {"exceptAfterOverload": true}],
     "@typescript-eslint/type-annotation-spacing": ["warn", 
     { "before": false, "after": true, 
     "overrides": { 
       "arrow": { "before": true, "after": true },
-      "colon": { "before": false, "after": true } }}],
-    "@typescript-eslint/indent": [
-      "warn",
-      2,
-      {"SwitchCase": 1}
+      "colon": { "before": false, "after": true } }}
     ],
+    "indent": "off",
+    "@typescript-eslint/indent": ["warn"],
+    "comma-spacing": "off",
+    "@typescript-eslint/comma-spacing": ["warn"],
     // length
     "max-len": [
       "warn",
@@ -150,13 +150,6 @@ module.exports = {
         "omitLastInOneLineBlock": false
       }
     ],
-    "comma-spacing": [
-      "warn",
-      {
-        "before": false,
-        "after": true
-      }
-    ],
     // Object rules
     "object-curly-spacing": [
       "warn",
@@ -205,9 +198,11 @@ module.exports = {
         "multiline": true,
         "minItems": 3
       }
-    ]
+    ],
+    // Function rules
+    "arrow-parens": ["warn", "always"]
   },
-  env: {
+  "env": {
     "node": true,
     "browser": false,
     "jest": true

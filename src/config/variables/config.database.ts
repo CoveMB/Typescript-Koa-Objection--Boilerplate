@@ -1,4 +1,4 @@
-import joi from '@hapi/joi';
+import joi from 'joi';
 import { ConfigError } from 'config/errors/error.types';
 
 /**
@@ -12,8 +12,9 @@ const envSchema = joi
       .string()
       .optional()
       .empty(''),
-    DB_NAME: joi.string(),
-    DB_PORT: joi.number(),
+    DB_NAME     : joi.string(),
+    DB_TEST_NAME: joi.string(),
+    DB_PORT     : joi.number(),
   })
   .unknown()
   .required();
@@ -29,8 +30,9 @@ if (error) {
 
 }
 
-export const dbName = envVars.DB_NAME;
-export const dbHost = envVars.DB_HOST;
-export const dbPort = envVars.DB_PORT;
-export const dbUser = envVars.DB_USER;
-export const dbPassword = envVars.DB_PASSWORD;
+export const dbName: string = envVars.DB_NAME;
+export const dbTestName: string = envVars.DB_TEST_NAME;
+export const dbHost: string = envVars.DB_HOST;
+export const dbPort: number = envVars.DB_PORT;
+export const dbUser: string = envVars.DB_USER;
+export const dbPassword: string = envVars.DB_PASSWORD;

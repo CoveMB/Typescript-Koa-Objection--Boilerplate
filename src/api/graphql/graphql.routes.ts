@@ -1,3 +1,4 @@
+import { authenticated } from 'globalMiddlewares';
 import { Middleware } from 'koa';
 import Router from 'koa-router';
 import * as controller from './graphql.controller';
@@ -12,6 +13,7 @@ export const graphqlSubRouter = () => {
   router
     .post(
       '/',
+      authenticated as Middleware,
       requests.query as Middleware,
       controller.graphql as Middleware
     );

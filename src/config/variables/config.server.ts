@@ -1,4 +1,4 @@
-import joi from '@hapi/joi';
+import joi from 'joi';
 import { ConfigError } from 'config/errors/error.types';
 
 /**
@@ -30,12 +30,12 @@ if (error) {
 
 }
 
-export const appName = envVars.APP_NAME;
-export const clientUrl = envVars.CLIENT_URL || 'http://localhost';
-export const env = envVars.NODE_ENV;
+export const appName: string = envVars.APP_NAME;
+export const clientUrl: string = envVars.CLIENT_URL || 'http://localhost';
+export const env: string = envVars.NODE_ENV;
 export const isTest = envVars.NODE_ENV === 'test';
 export const isDevelopment = envVars.NODE_ENV === 'development';
 export const isProduction = envVars.NODE_ENV === 'production';
-export const rootUrl = envVars.ROOT_URL || 'http://localhost';
-export const port = envVars.PORT || 3000;
-export const apiVersion = `v${envVars.API_VERSION}` || 'v1';
+export const rootUrl: string = envVars.ROOT_URL || 'http://localhost';
+export const port: number = envVars.PORT || 3000;
+export const apiVersion: string = `v${envVars.API_VERSION}` || 'v1';

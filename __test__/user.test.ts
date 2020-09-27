@@ -1,82 +1,79 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ValidationError } from 'config/errors/error.types';
+import { NotAuthenticatedError, ValidationError } from 'config/errors/error.types';
 import configServer from 'config/server';
 import { User } from 'models';
 import requestSetUp from 'supertest';
-import { serviceConsumerToken } from 'config/variables';
-import { getFreshToken, getUserData } from './fixtures/helper';
-import { setUpDb, tearDownDb } from './fixtures/setup';
+import { getCsrfAndSess, getFreshToken, getUserData } from './fixtures/helper';
+import { resetUserDB, setUp, tearDownDb } from './fixtures/setup';
 
 const server = configServer();
 const request = requestSetUp(server.callback());
 
-beforeAll(setUpDb);
+// Bind Knex and Objection with db
+beforeAll(() => setUp(request));
+
+// Reset the db with only the default User
+beforeEach(resetUserDB);
+
+// Rollback DB
 afterAll(tearDownDb);
 
-test('Should sign up new user, sending new token by email', async () => {
+test('Canot access profile if not authenticated', async () => {
 
-  const newUser = {
-    email: 'nezuser@email.com', password: 'P@ssword2000'
-  };
+  // Get security tokens
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
-  // Create user
+  // Try to access one user
   const response = await request
-    .post('/api/v1/users')
-    .set('Authorization', `Bearer ${serviceConsumerToken}`)
-    .send(newUser);
+    .get('/api/v1/users/1')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', sessionCookies);
 
-  // Query the new user
-  const newUserDB = await User.query()
-    .findOne({ email: newUser.email })
-    .withGraphFetched('tokens(orderByCreation)');
+  //  Not authorized action
+  expect(response.status).toBe(401);
 
-  const userTokens = newUserDB.tokens!;
+  //  Not authorized error message
+  expect(response.body.message).toBe('You need to be authenticated to perform this action');
 
-  // Get the expiration date of last generated token
-  const now = new Date();
+  //  Not authorized error name
+  expect(response.body.error).toBe(new NotAuthenticatedError().name);
 
-  expect(response.status).toBe(201);
-  expect(response.body).toEqual({ status: 'success' });
+});
 
-  // New user should exist in db
-  expect(newUserDB).not.toBeUndefined();
+test('Can access profile if authenticated', async () => {
 
-  // The newt user should have one new token
-  expect(userTokens.length).toBe(1);
+  // Get security tokens
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
-  // The expiration date of new token should be in an hour
-  expect(userTokens[0].expiration.getHours()).toBeLessThanOrEqual(now.getHours() + 1);
+  // Get fresh token
+  const { authCookies } = await getFreshToken(request);
+
+  // Access profile page sending the token
+  const response = await request
+    .get('/api/v1/users/profile')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ]);
+
+  expect(response.status).toBe(200);
 
 });
 
 test('Should update user', async () => {
 
-  const newUser = {
-    email: 'nezuser2@email.com', password: 'P@ssword2000'
-  };
+  // Get security tokens
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
-  // Create user
-  await request
-    .post('/api/v1/users')
-    .set('Authorization', `Bearer ${serviceConsumerToken}`)
-    .send(newUser);
-
-  // Query the new user
-  const {
-    tokens, id, email, uuid
-  } = await User.query()
-    .findOne({ email: newUser.email })
-    .withGraphFetched('tokens(orderByCreation)');
-
-  const token = tokens![0].token!;
+  // Get fresh  token and user uuid
+  const { user: { uuid, email, id }, authCookies } = await getFreshToken(request);
 
   // Request a user update with the fresh token
   const response = await request
     .patch(`/api/v1/users/${uuid}`)
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ])
     .send({
       email: `changed${email}`
-    })
-    .set('Authorization', `Bearer ${token}`);
+    });
 
   // Query the updated user
   const updatedUser = await User.query()
@@ -91,15 +88,18 @@ test('Should update user', async () => {
 
 test('Should not update user if invalid field is sent', async () => {
 
-  const { id } = getUserData();
+  // Get security tokens
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Get fresh token
-  const { token } = await getFreshToken(request);
+  const { authCookies } = await getFreshToken(request);
+  const { id } = getUserData();
 
   // Send request with invalid field
   const response = await request
     .patch(`/api/v1/users/${id}`)
-    .set('Authorization', `Bearer ${token}`)
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ])
     .send({
       'favorite-color': 'purple'
     });
@@ -112,27 +112,17 @@ test('Should not update user if invalid field is sent', async () => {
 
 test('Should delete user', async () => {
 
-  const newUser = {
-    email: 'nezuser2@email.com', password: 'P@ssword2000'
-  };
+  // Get security tokens
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
-  // Create user
-  await request
-    .post('/api/v1/users')
-    .set('Authorization', `Bearer ${serviceConsumerToken}`)
-    .send(newUser);
-
-  // Query the new user
-  const { id, tokens, uuid } = await User.query()
-    .findOne({ email: newUser.email })
-    .withGraphFetched('tokens(orderByCreation)');
-
-  const token = tokens![0].token!;
+  // Get fresh  token and user uuid
+  const { user: { uuid, id }, authCookies } = await getFreshToken(request);
 
   // Request user delete
   const response = await request
     .delete(`/api/v1/users/${uuid}`)
-    .set('Authorization', `Bearer ${token}`);
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ]);
 
   // Query user
   const deletedUser = await User.query()

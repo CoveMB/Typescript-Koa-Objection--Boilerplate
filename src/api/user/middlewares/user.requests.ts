@@ -1,18 +1,16 @@
-import Joi from '@hapi/joi';
+import Joi from 'joi';
 import { validateRequest } from 'globalMiddlewares';
 import { RequestSchema } from 'types';
 
 // Create and Update schema
-export type CreateUpdateUserRequest = RequestSchema<{
-  email: string,
-  password: string
+export type UpdateUserRequest = RequestSchema<{
+  email: string
 }>;
 
 // Define schema to validate request body
-export const createUpdateSchema = validateRequest(Joi.object({
+export const updateSchema = validateRequest(Joi.object({
   email: Joi
     .string()
-    .email(),
-  password: Joi
-    .string()
+    .email()
+    .required()
 }));

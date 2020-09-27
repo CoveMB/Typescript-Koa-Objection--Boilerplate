@@ -6,6 +6,7 @@ ENV NODE_ENV=development
 # Add some dependencies for (bcrypt)
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
+  psmisc \
   python && \
   rm -rf /var/lib/apt/lists/*
 

@@ -1,6 +1,6 @@
 import { ValidationError } from 'config/errors/error.types';
 import { Context, Next } from 'koa';
-import { ObjectSchema } from '@hapi/joi';
+import { ObjectSchema } from 'joi';
 
 const validateRequest = (
   schema: ObjectSchema

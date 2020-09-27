@@ -1,7 +1,9 @@
-/* eslint-disable import/no-cycle */
+
+import { cookies, isDevelopment } from 'config/variables';
 import BaseModel from 'models/BaseModel';
 import User from 'models/User/User';
 import { Modifiers, RelationMappings, QueryBuilder } from 'objection';
+import { Context } from 'vm';
 import TokenQueryBuilder from './token.queries';
 
 export default class Token extends BaseModel {
@@ -53,6 +55,44 @@ export default class Token extends BaseModel {
       }
     },
   });
+
+  static setCookies = (
+    ctx: Context,
+    token: string,
+    user: User,
+    temporary: boolean
+  ): void => {
+
+    // If it is a long term token we can set them in a cookie
+    if (!temporary) {
+
+      // Set the new token in a cookie not accessible from javascript
+      ctx.cookies.set(cookies.AuthCookieName, token, {
+        sameSite: 'lax',
+        httpOnly: true,
+        secure  : !isDevelopment
+      });
+
+      // Set the user in a cookie accessible from javascript
+      ctx.cookies.set(cookies.UserCookieName, JSON.stringify({
+        uuid: user.uuid, email: user.email, profilePicture: user.profilePicture
+      }), {
+        sameSite: 'lax',
+        httpOnly: false,
+        secure  : !isDevelopment
+      });
+
+    }
+
+  };
+
+  static removeCookies = (ctx: Context): void => {
+
+    // Delete auth and user cookie
+    ctx.cookies.set(cookies.AuthCookieName);
+    ctx.cookies.set(cookies.UserCookieName);
+
+  };
 
   static modifiers: Modifiers = {
 

@@ -1,34 +1,64 @@
-import cors from '@koa/cors';
-import corsOptions from 'config/cors';
 import { errorEvent, errorHandler } from 'config/errors/error.event';
-import { error, log, authenticated } from 'globalMiddlewares';
-import Koa, { DefaultState } from 'koa';
+import {
+  cors, csrf, error, log, session, throttleLimit, verifyAuthToken
+} from 'globalMiddlewares';
+import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import compress from 'koa-compress';
 import helmet from 'koa-helmet';
 import { userAgent } from 'koa-useragent';
 import registerRouters from 'api';
-import { ContextWithGlobalMiddleware, StatefulKoa } from 'types';
+import { csrfSecret } from './variables';
 
-const configServer = (): StatefulKoa => {
+const configServer = (): Koa => {
 
   /**
    * Create app
   */
-  const app = new Koa<DefaultState, ContextWithGlobalMiddleware>();
+  const app = new Koa();
+
+  // Keys to be used to encrypt cookies
+  app.keys = [ csrfSecret as string ];
 
   /**
    * Register global middlewares
   */
 
-  app.use(helmet())            // Provides security headers
-    .use(cors(corsOptions))    // Configure cors
-    .use(userAgent)            // Attach user agent to the context
-    .use(bodyParser())         // Parse the body request
-    .use(log)                  // Log every logRequests
-    .use(error)                // Handle trowed errors
-    .use(compress())           // Allow compress
-    .use(authenticated);       // Makes sure every request are authenticated
+  app
+
+    // Provides security headers
+    .use(helmet())
+
+    // Handle trowed errors
+    .use(error)
+
+    // Configure cors
+    .use(cors)
+
+    // Throttle policy to prevent brute force attacks
+    .use(throttleLimit)
+
+    // Verify the validity of auth token
+    .use(verifyAuthToken)
+
+    // Attach user agent to the context
+    .use(userAgent)
+
+    // Parse the body request
+    .use(bodyParser())
+
+    // Log every logRequests
+    .use(log)
+
+    // Allow compress
+    .use(compress())
+
+    // Set up sessions tokens sent only through http
+    .use(session(app))
+
+    // Set up CSRF token to prevent attacks
+    // it rely on sessions Middleware
+    .use(csrf);
 
   /**
    * Register events

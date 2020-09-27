@@ -5,11 +5,12 @@ addPath(`${__dirname}/src`);
 
 import { ConfigError } from 'config/errors/error.types';
 import {
-  dbHost, dbName, dbPassword, dbPort, dbUser
+  dbHost, dbName, dbPassword, dbPort, dbUser, dbTestName
 } from 'config/variables';
 import { knexSnakeCaseMappers } from 'objection';
+import { KnexConnectionConfig } from 'types';
 
-const getKnexConfig = (configType: 'production' | 'test' = 'production') => {
+const getKnexConfig = (configType: 'production' | 'test' = 'production'): KnexConnectionConfig => {
 
   if (configType === 'production') {
 
@@ -19,7 +20,7 @@ const getKnexConfig = (configType: 'production' | 'test' = 'production') => {
         host    : dbHost || 'localhost',
         port    : dbPort || 5432,
         user    : dbUser || 'postgres',
-        password: dbPassword || undefined,
+        password: dbPassword,
         database: dbName
       },
       pool: {
@@ -39,8 +40,8 @@ const getKnexConfig = (configType: 'production' | 'test' = 'production') => {
         host    : dbHost || 'localhost',
         port    : dbPort || 5432,
         user    : dbUser || 'postgres',
-        password: dbPassword || undefined,
-        database: `${dbName}-test`
+        password: dbPassword,
+        database: dbTestName
       },
       searchPath: [ 'knex', 'public' ],
       ...knexSnakeCaseMappers()

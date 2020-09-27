@@ -1,4 +1,4 @@
-import Joi from '@hapi/joi';
+import Joi from 'joi';
 import { validateRequest } from 'globalMiddlewares';
 
 // GraphQl

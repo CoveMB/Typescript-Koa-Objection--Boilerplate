@@ -1,5 +1,5 @@
-/* eslint-disable import/no-cycle */
-import Joi from '@hapi/joi';
+
+import Joi from 'joi';
 import { ValidationError } from 'config/errors/error.types';
 import passwordComplexity from 'joi-password-complexity';
 import { PartialModelObject, Expression } from 'objection';

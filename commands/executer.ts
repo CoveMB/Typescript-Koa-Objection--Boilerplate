@@ -4,6 +4,9 @@ import { addPath } from 'app-module-path';
 addPath('/node/app/src');
 import connectDB from 'config/database';
 import { Model } from 'objection';
+import { CommandExecuter } from 'types';
+
+// import { CommandExecuter } from 'types/command';
 
 const setup = async (): Promise<void> => {
 

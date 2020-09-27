@@ -1,7 +1,6 @@
-import { Token, User } from 'models';
-import { sendConfirmationEmail } from 'models/User/Token/token.emails';
+import { User } from 'models';
 import { StatefulMiddleware } from 'types';
-import { CreateUpdateUserRequest } from './middlewares/user.requests';
+import { UpdateUserRequest } from './middlewares/user.requests';
 import { GetUserByIdRecords, GetAllUserRecords } from './middlewares/user.records';
 
 // The user the the parameter comes from the authenticated middleware
@@ -65,38 +64,10 @@ export const getAll: StatefulMiddleware<GetAllUserRecords> = async ctx => {
 
 };
 
-export const createOne: StatefulMiddleware<CreateUpdateUserRequest> = async ctx => {
-
-  try {
-
-    const { state: { validatedRequest: userData }, userAgent } = ctx;
-
-    // Create new user
-    const user = await User.query().insert(userData);
-
-    // Generate JWT token for the new user
-    const temporary = true;
-    const token = await Token.query()
-      .generateAuthToken(user, userAgent, temporary);
-
-    sendConfirmationEmail(ctx, user, token);
-
-    // And send it back
-    ctx.status = 201;
-    ctx.body = {
-      status: 'success'
-    };
-
-  } catch (error) {
-
-    ctx.throw(error);
-
-  }
-
-};
-
 // The id the the parameter comes from the isSelfOrAdmin middleware
-export const updateOne: StatefulMiddleware<CreateUpdateUserRequest & GetUserByIdRecords> = async ctx => {
+export const updateOne: StatefulMiddleware<
+UpdateUserRequest & GetUserByIdRecords
+> = async ctx => {
 
   try {
 

@@ -1,4 +1,5 @@
-/* eslint-disable import/no-cycle */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 /* eslint-disable no-multi-spaces */
 /* eslint-disable no-param-reassign */
 import BaseModel from 'models/BaseModel';
@@ -86,10 +87,9 @@ export default class User extends BaseModel {
 
     super.$formatJson(user);
 
+    // We disable typescript here to allow the deletion of the id before the instance is return
+    // @ts-ignore
     delete user.password;
-    delete user.admin;
-    delete user.createdAt;
-    delete user.updatedAt;
 
     return user;
 

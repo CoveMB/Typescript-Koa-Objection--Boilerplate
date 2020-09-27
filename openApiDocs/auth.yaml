@@ -4,20 +4,79 @@ servers:
   - description: Auth API
     url: https://virtserver.swaggerhub.com/BenjaminMarquis/Authentication/1.0.0
 info:
-  description: Auth API
-  version: "1.0.0"
+  description: Auth API microservice
+  version: 2.0.0
   title: Auth API
-  
-security:
-  - BearerAuth: []
+
   
 paths:
+
+  /register:
+    post:
+      summary: Register new user
+      operationId: registerUser
+      description: Register a new user with an email to send a link to set password by email including a short live token
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          $ref : '#/components/responses/200Success'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+  
+  /set-password:
+    patch:
+      summary: Set a new password
+      operationId: setPassword
+      description: Will change the user's password using passing the token from the email and log him/her in the app generating a new long live jwt auth token
+      security:
+      - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+      responses:
+        '200':
+          description: User changed the password and has been logged in with fresh jwt token, it set a http only cooky containing encrypted info about user in a JWT token and an accessible cookie with some info about user to be used by client app
+          headers: 
+            Set-Cookie:
+              $ref: '#/components/schemas/LoggedInCookies'
+
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
+
+  /check-token:
+    get:
+      summary: Check if the token of the user is still valid
+      operationId: checkToken
+      description: Check if the token of the user is still valid using the token sent in the auth cookie
+      security:
+      - CookieAuth: []
+      responses:
+        '200':
+          $ref : '#/components/responses/200Success'
+        '401':
+          $ref : '#/components/responses/401NotAuthenticated'
+        '500':
+          $ref: '#/components/responses/500ServerError'
   
   /login:
     post:
-      summary: login users
+      summary: Login user
       operationId: login
-      description: login a user with it's credentials
+      description: Login a user with it's credentials generating a new JWT token that will be sent in the HTTP only auth cookie
+      security:
+      - BearerAuth: []
       requestBody:
         content:
           application/json:
@@ -25,16 +84,21 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: user logged in
+          description: The User has successfully logged in, a fresh JWT token has been generated and sent by HTTP only cookie
+          headers: 
+            Set-Cookie:
+              $ref: '#/components/schemas/LoggedInCookies'
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  status:
+                    type: string
+                    example: "success"
                   user:
                     $ref: '#/components/schemas/User'
-                  token:
-                    $ref: '#/components/schemas/Token'
+                  
         '401':
           description: Could not login user
           content:
@@ -49,9 +113,11 @@ paths:
   
   /logout:
     post:
-      summary: logout a user
+      summary: Logout a user
       operationId: logout
-      description: logout a user by the given token
+      description: Logout a user, it will either revoke the token sent in the body of the request or it will use the token in sent in the auth cookie
+      security:
+      - CookieAuth: []
       requestBody:
         content:
           application/json:
@@ -66,23 +132,12 @@ paths:
           $ref: '#/components/responses/500ServerError'
           
   /logout-all:
-    post:
-      summary: logout all tokens
+    delete:
+      summary: Logout all tokens
       operationId: logoutAll
-      description: logout all tokens of a user
-      responses:
-        '200':
-          $ref : '#/components/responses/200Success'
-        '401':
-          $ref : '#/components/responses/401NotAuthenticated'
-        '500':
-          $ref: '#/components/responses/500ServerError'
-  
-  /check-token:
-    post:
-      summary: check a token
-      operationId: checkToken
-      description: check the validity of a token
+      description: Delete all tokens of a user authenticated in the sent auth cookie
+      security:
+      - CookieAuth: []
       responses:
         '200':
           $ref : '#/components/responses/200Success'
@@ -95,7 +150,9 @@ paths:
     post:
       summary: request a password reset
       operationId: requestPasswordReset
-      description: will request a link to reset the password
+      description: Will request a link to reset the password, an email will be sent to the user with a short live token to reset his password
+      security:
+      - BearerAuth: []
       requestBody:
         content:
           application/json:
@@ -108,39 +165,14 @@ paths:
           $ref : '#/components/responses/401NotAuthenticated'
         '500':
           $ref: '#/components/responses/500ServerError'
-
-  /set-password:
-    post:
-      summary: set a new password
-      operationId: setPassword
-      description: will change the user's password and log him/her in
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SetPasswordRequest'
-      responses:
-        '200':
-          description: user logged in
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    $ref: '#/components/schemas/User'
-                  token:
-                    $ref: '#/components/schemas/Token'
-        '401':
-          $ref : '#/components/responses/401NotAuthenticated'
-        '500':
-          $ref: '#/components/responses/500ServerError'
           
   /register-third-party:
     post:
-      summary: third party login
+      summary: Third party SSO login
       operationId: registerThirdParty
-      description: register a new user through a third party login
+      description: Register a new user through a third party login either creating a new user or updating one found in the db, it will generate a new long live token sent in the auth cookie
+      security:
+      - BearerAuth: []
       requestBody:
         content:
           application/json:
@@ -148,7 +180,10 @@ paths:
               $ref: '#/components/schemas/RegisterThirdPartyRequest'
       responses:
         '200':
-          description: user logged in
+          description: The user has been register or updated and a fresh JWT token has been sent
+          headers: 
+            Set-Cookie:
+              $ref: '#/components/schemas/LoggedInCookies'
           content:
             application/json:
               schema:
@@ -166,7 +201,33 @@ paths:
 components:
   
   schemas:
-  
+
+    RegisterRequest:
+      description: register third party payload
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: example@email.com
+    
+    SetPasswordRequest:
+      description: password set payload
+      type: object
+      required:
+       - password
+      properties:
+        password:
+          type: string
+          example: Password23
+        token:
+          type: string
+          format: token
+          example: eyJhbGciOiJIUzI1NiJ9.VTJGc2RHVmrtyyamdocU15bVBHTnVRT1ZPUjVyeDdSTlpWS2JNZmQ5UlRGVzlFSlNZY2NHZVU1RWpIVlE252oXyTfHA...
+
+
     RegisterThirdPartyRequest:
       description: register third party payload
       type: object
@@ -192,16 +253,6 @@ components:
             googleId:
               type: string
               example: "kuybyu9876"
-    
-    SetPasswordRequest:
-      description: password set payload
-      type: object
-      required:
-       - password
-      properties:
-        password:
-          type: string
-          example: Password23
   
     RequestPasswordResetRequest:
       description: password reset payload
@@ -241,6 +292,11 @@ components:
             format: token
             example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
   eyJpc3MiOiJ0b3B0YWwuY29tIiwiZXhwIjoxNDI2NDIwODAwLC"
+
+    LoggedInCookies:
+      description: The cookies set on a successful login one containing encrypted information about the user inside a JWT token the other simple info about the user to be used by client app like profile picture
+      type: string
+      example: app.jtok=eyJhbGciOiJIUzI1NiJ9.VTJGcRQKzlvK2tOZm5NeVNJBVTU7y2EzdUZTc1FtT0hkZHlUbnJKdEhsQk9KYmxScTFtSWxqLzgwaUJwL1I.fMbZnq36TSI2d53eterFuc4bWIMjre4...; path=/; samesite=lax; httponly ; app.user={"uuid":"992c1be5-3239-4a58-8c0b-489b7c47fe7c","email":"user@email.com" ,"profilePicture":"https://profile.png"}; path=/; samesite=lax
    
    
     User:
@@ -260,6 +316,9 @@ components:
         name:
           type: string
           example: "Joana"
+        profilePicture:
+          type: string
+          example: "http://profile.png"
         googleID:
           type: string
           example: "sds908J"
@@ -270,8 +329,7 @@ components:
         token:
           type: string
           format: token
-          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
-eyJpc3MiOiJ0b3B0YWwuY29tIiwiZXhwIjoxNDI2NDIwODAwLC"
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0b3B0YWwuY29tIiwiZXhwIjoxNDI2NDIwODAwLC"
         expiration:
           type: string
           format: date
@@ -297,7 +355,7 @@ eyJpc3MiOiJ0b3B0YWwuY29tIiwiZXhwIjoxNDI2NDIwODAwLC"
   responses:
   
     200Success:
-      description: Simple success feedback
+      description: Simple success feddback
       content:
         application/json:
           schema:
@@ -361,6 +419,13 @@ eyJpc3MiOiJ0b3B0YWwuY29tIiwiZXhwIjoxNDI2NDIwODAwLC"
   
   securitySchemes:
     BearerAuth:
+      description: The app required every request to be identified if the User is logged out the client app will identified itself with a Bearer Token
       type: http
       scheme: bearer
       bearerFormat: JWT
+    
+    CookieAuth:
+      description: The app required every request to be identified if the User is logged in the requests of the user will be identified with a cookie containing encrypted information about the user inside a JWT token
+      type: apiKey
+      in: cookie
+      name: app.jtok

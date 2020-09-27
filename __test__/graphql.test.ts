@@ -1,41 +1,49 @@
 import configServer from 'config/server';
 import requestSetUp from 'supertest';
 import { NotAuthenticatedError } from 'config/errors/error.types';
-import { getFreshToken } from './fixtures/helper';
-import { setUpDb, tearDownDb } from './fixtures/setup';
+import { getCsrfAndSess, getFreshToken } from './fixtures/helper';
+import { resetUserDB, setUp, tearDownDb } from './fixtures/setup';
 
 const server = configServer();
 const request = requestSetUp(server.callback());
 
-// Setup
-beforeAll(setUpDb);
+// Bind Knex and Objection with db
+beforeAll(() => setUp(request));
+
+// Reset the db with only the default User
+beforeEach(resetUserDB);
+
+// Rollback DB
 afterAll(tearDownDb);
 
 test('Should only be able to make a post request to graphql endpoint', async () => {
 
   // Get fresh token
-  const { token } = await getFreshToken(request);
+  const { authCookies } = await getFreshToken(request);
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   const query = `
     query {
         users(orderBy: id) {
           id
           email
-          
+
           tokens {
             id
             token
           }
-      
+
         }
     }`;
 
   // Access profile page sending the token
-  const response = await request.get('/api/v1/graphql')
+  const response = await request
+    .get('/api/v1/graphql')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ])
     .send({
       query
-    })
-    .set('Authorization', `Bearer ${token}`);
+    });
 
   //  Not authorized GET action
   expect(response.status).toBe(405);
@@ -44,22 +52,27 @@ test('Should only be able to make a post request to graphql endpoint', async () 
 
 test('Should be authenticated to make requests to graphql endpoint', async () => {
 
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
+
   const query = `
     query {
         users(orderBy: id) {
           id
           email
-          
+
           tokens {
             id
             token
           }
-      
+
         }
     }`;
 
   // Access profile page sending the token
-  const response = await request.post('/api/v1/graphql')
+  const response = await request
+    .post('/api/v1/graphql')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies ])
     .send({
       query
     });
@@ -75,7 +88,8 @@ test('Should be authenticated to make requests to graphql endpoint', async () =>
 test('Should only be able to query data related to authenticated user', async () => {
 
   // Get fresh token and related user from db
-  const { token, user } = await getFreshToken(request);
+  const { authCookies, user } = await getFreshToken(request);
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Query all users and all tokens
   const query = `
@@ -94,11 +108,13 @@ test('Should only be able to query data related to authenticated user', async ()
     }`;
 
   // Access profile page sending the token
-  const response = await request.post('/api/v1/graphql')
+  const response = await request
+    .post('/api/v1/graphql')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ])
     .send({
       query
-    })
-    .set('Authorization', `Bearer ${token}`);
+    });
 
   const responseData = response.body.data;
 

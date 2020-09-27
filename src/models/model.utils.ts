@@ -1,6 +1,6 @@
 import { Model, Expression } from 'objection';
 import { ValidationError, NotFoundError } from 'config/errors/error.types';
-import { StringSchema } from '@hapi/joi';
+import { StringSchema } from 'joi';
 
 const validateInput = (schema: StringSchema, input: Expression<string>): void => {
 

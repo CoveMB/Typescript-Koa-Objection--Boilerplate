@@ -30,6 +30,9 @@ export default class BaseModel extends Model {
 
     super.$formatJson(instance);
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // We disable typescript here to allow the deletion of the id before the instance is return
     // eslint-disable-next-line no-param-reassign
     delete instance.id;
 

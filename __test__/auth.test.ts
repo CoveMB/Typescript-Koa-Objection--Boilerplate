@@ -2,27 +2,77 @@
 
 import { NotAuthenticatedError } from 'config/errors/error.types';
 import configServer from 'config/server';
+import { cookies } from 'config/variables';
 import { Token, User } from 'models';
 import requestSetUp from 'supertest';
-import { serviceConsumerToken } from 'config/variables';
-import { getFreshToken, getUserData } from './fixtures/helper';
-import { setUpDb, tearDownDb } from './fixtures/setup';
+import {
+  getCookiesFromHeaders,
+  getCsrfAndSess, getFreshToken, getNotAuthenticatedToken, getTokenFromAuthCookies, getUserData
+} from './fixtures/helper';
+import { resetUserDB, setUp, tearDownDb } from './fixtures/setup';
 
 const server = configServer();
 const request = requestSetUp(server.callback());
 
-// Setup
-beforeAll(setUpDb);
+// Bind Knex and Objection with db
+beforeAll(() => setUp(request));
+
+// Reset the db with only the default User
+beforeEach(resetUserDB);
+
+// Rollback DB
 afterAll(tearDownDb);
+
+test('Should sign up new user, sending new token by email', async () => {
+
+  const serviceConsumerToken = getNotAuthenticatedToken();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
+  const newUser = { email: 'newuser@email.com' };
+
+  // Create user
+  const response = await request
+    .post('/api/v1/register')
+    .set('csrf-token', csrfToken)
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .set('Cookie', sessionCookies)
+    .send(newUser);
+
+  // Query the new user
+  const newUserDB = await User.query()
+    .findOne({ email: newUser.email })
+    .withGraphFetched('tokens(orderByCreation)');
+
+  const userTokens = newUserDB.tokens!;
+
+  // Get the expiration date of last generated token
+  const now = new Date();
+
+  expect(response.status).toBe(201);
+  expect(response.body).toEqual({ status: 'success' });
+
+  // New user should exist in db
+  expect(newUserDB).not.toBeUndefined();
+
+  // The newt user should have one new token
+  expect(userTokens.length).toBe(1);
+
+  // The expiration date of new token should be in an hour
+  expect(userTokens[0].expiration.getHours()).toBeLessThanOrEqual(now.getHours() + 1);
+
+});
 
 test('Should login user with correct authentication dont return plain password', async () => {
 
+  const serviceConsumerToken = getNotAuthenticatedToken();
   const { credentials, email, password } = getUserData();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Logging request
   const response = await request
     .post('/api/v1/login')
+    .set('csrf-token', csrfToken)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .set('Cookie', sessionCookies)
     .send(credentials);
 
   const userDb = await User.query()
@@ -41,17 +91,22 @@ test('Should login user with correct authentication dont return plain password',
 
 test('Should generate fresh valid 6 month token on logging', async () => {
 
+  const serviceConsumerToken = getNotAuthenticatedToken();
   const { credentials } = getUserData();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Logging request
-  const response = await request
+  await request
     .post('/api/v1/login')
+    .set('csrf-token', csrfToken)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .set('Cookie', sessionCookies)
     .send(credentials);
 
   // Get the generated token from database
-  const token = await Token.query()
-    .findOne({ token: response.body.token.token });
+  const { tokens } = await User.query()
+    .findOne({ email: credentials.email })
+    .withGraphFetched('tokens(orderByCreation)');
 
   // Get it's expiration date
   const now = new Date();
@@ -59,22 +114,23 @@ test('Should generate fresh valid 6 month token on logging', async () => {
   // Mutate now to be 6 month from now
   now.setMonth(now.getMonth() + 6);
 
-  // The right token is return
-  expect(response.body.token.token).toBe(token.token);
-
   //  Should be more than 6 mont valid
-  expect(token.expiration.getMonth()).toBe(now.getMonth());
+  expect(tokens![0].expiration.getMonth()).toBe(now.getMonth());
 
 });
 
 test('Should not login user with wrong password', async () => {
 
+  const serviceConsumerToken = getNotAuthenticatedToken();
   const { email, password } = getUserData();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
-  // Logging attempt
+  // Logging request
   const response = await request
     .post('/api/v1/login')
+    .set('csrf-token', csrfToken)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .set('Cookie', sessionCookies)
     .send({
       email, password: `wong${password}`
     });
@@ -87,47 +143,18 @@ test('Should not login user with wrong password', async () => {
 
 });
 
-test('Canot access profile if not authenticated', async () => {
-
-  // Try to access one user
-  const response = await request.get('/api/v1/users/1');
-
-  //  Not authorized action
-  expect(response.status).toBe(401);
-
-  //  Not authorized error message
-  expect(response.body.message).toBe('You need to be authenticated to perform this action');
-
-  //  Not authorized error name
-  expect(response.body.error).toBe(new NotAuthenticatedError().name);
-
-});
-
-test('Can access profile if authenticated', async () => {
+test('Should revoke a given token', async () => {
 
   // Get fresh token
-  const { token } = await getFreshToken(request);
-
-  // Access profile page sending the token
-  const response = await request.get('/api/v1/users/profile')
-    .set('Authorization', `Bearer ${token}`);
-
-  expect(response.status).toBe(200);
-
-});
-
-test('Should logout user and revoke token', async () => {
-
-  // Get fresh token
-  const { token } = await getFreshToken(request);
+  const { token, authCookies } = await getFreshToken(request);
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Request logout
   const response = await request
     .post('/api/v1/logout')
-    .send({
-      token
-    })
-    .set('Authorization', `Bearer ${token}`);
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ])
+    .send({ token });
 
   //  Query the token
   const tokenDb = await Token.query()
@@ -140,41 +167,40 @@ test('Should logout user and revoke token', async () => {
 
 });
 
-test('Should not be able to logout with revoked token', async () => {
+test('Should logout user and revoke token', async () => {
 
   // Get fresh token
-  const { token } = await getFreshToken(request);
+  const { authCookies, token } = await getFreshToken(request);
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Request logout
-  await request
+  const response = await request
     .post('/api/v1/logout')
-    .send({
-      token
-    })
-    .set('Authorization', `Bearer ${token}`);
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ]);
 
-  // Request logout
-  const secondLogout = await request
-    .post('/api/v1/logout')
-    .send({
-      token
-    })
-    .set('Authorization', `Bearer ${token}`);
+  //  Query the token
+  const tokenDb = await Token.query()
+    .findOne({ token });
 
-  // The token was already revoked
-  expect(secondLogout.status).toBe(401);
+  expect(response.status).toBe(200);
+
+  // The token should not be found in the db
+  expect(tokenDb).toBeUndefined();
 
 });
 
 test('Should revoke all tokens', async () => {
 
   // Get fresh token and it's associated user
-  const { token, user } = await getFreshToken(request);
+  const { authCookies, user } = await getFreshToken(request);
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Request logout all
   const logoutResponse = await request
-    .post('/api/v1/logout-all')
-    .set('Authorization', `Bearer ${token}`);
+    .delete('/api/v1/logout-all')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ]);
 
   // Query the user
   const dbUser = await User.query()
@@ -191,12 +217,14 @@ test('Should revoke all tokens', async () => {
 test('Should validate existing token', async () => {
 
   // Get fresh token
-  const { token } = await getFreshToken(request);
+  const { authCookies } = await getFreshToken(request);
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Request to check the token validity
   const response = await request
-    .post('/api/v1/check-token')
-    .set('Authorization', `Bearer ${token}`);
+    .get('/api/v1/check-token')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ]);
 
   expect(response.status).toBe(200);
 
@@ -205,26 +233,26 @@ test('Should validate existing token', async () => {
 test('Should not validate revoked tokens', async () => {
 
   // Get fresh token
-  const { token } = await getFreshToken(request);
+  const { authCookies } = await getFreshToken(request);
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Request logout (revoke token)
   await request
     .post('/api/v1/logout')
-    .send({
-      token
-    })
-    .set('Authorization', `Bearer ${token}`);
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ]);
 
   // Request to check the token validity
   const response = await request
-    .post('/api/v1/check-token')
-    .set('Authorization', `Bearer ${token}`);
+    .get('/api/v1/check-token')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', [ ...sessionCookies, ...authCookies ]);
 
   // Not authorized action since the token was already revoked
   expect(response.status).toBe(401);
 
   //  Not authorized error message
-  expect(response.body.message).toBe('You need to be authenticated to perform this action');
+  expect(response.body.message).toBe(new NotAuthenticatedError().message);
 
   //  Not authorized error name
   expect(response.body.error).toBe(new NotAuthenticatedError().name);
@@ -234,14 +262,16 @@ test('Should not validate revoked tokens', async () => {
 test('Should request a password reset generating a temporary 1h valid token', async () => {
 
   const { email } = getUserData();
+  const serviceConsumerToken = getNotAuthenticatedToken();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Request a password reset
   const response = await request
     .post('/api/v1/request-password-reset')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', sessionCookies)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
-    .send({
-      email
-    });
+    .send({ email });
 
   // Query the user and it's token by order of creation
   const userDb = await User.query()
@@ -269,49 +299,56 @@ test('Should request a password reset generating a temporary 1h valid token', as
 test('Should reset the password of user and make it unable to log with old password', async () => {
 
   const { credentials, password, email } = getUserData();
+  const serviceConsumerToken = getNotAuthenticatedToken();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Request a password reset
   await request
     .post('/api/v1/request-password-reset')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', sessionCookies)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
-    .send({
-      email
-    });
+    .send({ email });
 
   // Query the user and it's token by order of creation
   const userDb = await User.query()
     .findOne({ email })
     .withGraphFetched('tokens(orderByCreation)');
 
-  const token = userDb.tokens ? userDb.tokens[0].token : undefined;
+  const { token } = userDb.tokens![0];
+
+  const newPassword = `${password}changed`;
 
   // Actually reset the password with last token of the user
   const response = await request
-    .post('/api/v1/set-password')
+    .patch('/api/v1/set-password')
+    .set('csrf-token', csrfToken)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .set('Cookie', sessionCookies)
     .send({
-      password: `${password}2`
-    })
-    .set('Authorization', `Bearer ${token}`);
+      password: newPassword, token
+    });
 
   // Try login with old password
   const responseOldPassword = await request
     .post('/api/v1/login')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', sessionCookies)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(credentials);
 
   // Try login with new password
   const responseNewPassword = await request
     .post('/api/v1/login')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', sessionCookies)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send({
-      email, password: `${password}2`
+      email, password: newPassword
     });
 
-  expect(response.status).toBe(200);
-
-  // Should be the right user
-  expect(response.body.user.email).toBe(userDb.email);
+  // Password has been changed
+  expect(response.status).toBe(204);
 
   // Login with new password should work
   expect(responseNewPassword.status).toBe(200);
@@ -323,39 +360,45 @@ test('Should reset the password of user and make it unable to log with old passw
 
 test('Should reset the password and generate a fresh token and revoke all other tokens', async () => {
 
-  const { credentials, password, email } = getUserData();
+  const { credentials, email, password } = getUserData();
+  const serviceConsumerToken = getNotAuthenticatedToken();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   // Create an extra token
   await request
     .post('/api/v1/login')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', sessionCookies)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
     .send(credentials);
 
   // Request a password reset
   await request
     .post('/api/v1/request-password-reset')
+    .set('csrf-token', csrfToken)
+    .set('Cookie', sessionCookies)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
-    .send({
-      email
-    });
+    .send({ email });
 
   // Query the user and it's token by order of creation
-  const userDb = await User.query()
+  const { tokens : dbTokens } = await User.query()
     .findOne({ email })
     .withGraphFetched('tokens(orderByCreation)');
 
-  const token = userDb.tokens ? userDb.tokens[0].token : undefined;
+  const { token: dbToken } = dbTokens![0];
 
   // Actually reset the password with last token of the user
   const response = await request
-    .post('/api/v1/set-password')
+    .patch('/api/v1/set-password')
+    .set('csrf-token', csrfToken)
+    .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .set('Cookie', sessionCookies)
     .send({
-      password: `${password}3`
-    })
-    .set('Authorization', `Bearer ${token}`);
+      password: `New${password}`, token: dbToken
+    });
 
   // Query the user and it's tokens by order of creation
-  const userDbAfterReset = await User.query()
+  const { tokens : dbTokensAfterReset } = await User.query()
     .findOne({ email })
     .withGraphFetched('tokens(orderByCreation)');
 
@@ -365,29 +408,35 @@ test('Should reset the password and generate a fresh token and revoke all other 
   // Mutate now to be 6 month from now
   now.setMonth(now.getMonth() + 6);
 
-  const userTokens = userDbAfterReset.tokens!;
+  const lastToken = getTokenFromAuthCookies(
+    getCookiesFromHeaders(response.headers, cookies.AuthCookieName)
+  );
 
   // The body should contains the new token
-  expect(response.body.token.token).toBe(userTokens[0].token);
+  expect(lastToken).toBe(dbTokensAfterReset![0].token);
 
   // The new token should be 6 month valid
-  expect(userTokens[0].expiration.getMonth()).toBe(now.getMonth());
+  expect(dbTokensAfterReset![0].expiration.getMonth()).toBe(now.getMonth());
 
   // All other tokens should has been revoked
-  expect(userTokens.length).toBe(1);
+  expect(dbTokensAfterReset!.length).toBe(1);
 
 });
 
 test('Should login through a third party authentication and update profiles', async () => {
 
   const { email } = getUserData();
+  const serviceConsumerToken = getNotAuthenticatedToken();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
 
   const profilePicture = 'http://profile.png';
 
   // Create an extra token
   const response = await request
     .post('/api/v1/register-third-party')
+    .set('csrf-token', csrfToken)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
+    .set('Cookie', sessionCookies)
     .send({
       user: {
         email, profilePicture
@@ -407,11 +456,11 @@ test('Should login through a third party authentication and update profiles', as
 
   const userTokens = userDb.tokens!;
 
-  // The body should contains the new token
-  expect(response.body.token.token).toBe(userTokens[0].token);
+  // The user was created/updated
+  expect(response.status).toBe(200);
 
   // The new token should be 6 month valid
-  expect(userTokens[1].expiration.getMonth()).toBe(now.getMonth());
+  expect(userTokens[0].expiration.getMonth()).toBe(now.getMonth());
 
   // Should have updated user's data
   expect(userDb.profilePicture).toBe(profilePicture);

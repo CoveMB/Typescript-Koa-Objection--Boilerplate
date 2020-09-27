@@ -1,4 +1,4 @@
-import Joi from '@hapi/joi';
+import Joi from 'joi';
 import { validateRequest } from 'globalMiddlewares';
 import { RequestSchema } from 'types';
 
@@ -18,15 +18,28 @@ export const loginSchema = validateRequest(Joi.object({
     .required()
 }));
 
+// Register
+// Create and Update schema
+export type RegisterRequest = RequestSchema<{
+  email: string
+}>;
+
+// Define schema to validate request body
+export const register = validateRequest(Joi.object({
+  email: Joi
+    .string()
+    .email()
+    .required()
+}));
+
 // Logout
 export type LogoutRequest = RequestSchema<{
-  token: string
+  token?: string
 }>;
 
 export const logoutSchema = validateRequest(Joi.object({
   token: Joi
     .string()
-    .required()
 }));
 
 // Logout all
@@ -35,20 +48,22 @@ export const logoutAllSchema = validateRequest(Joi.object({
 
 // Set password
 export type SetPasswordRequest = RequestSchema<{
-  email: string,
-  password: string
+  password: string,
+  token: string
 }>;
 
 export const setPasswordSchema = validateRequest(Joi.object({
   password: Joi
+    .string()
+    .required(),
+  token: Joi
     .string()
     .required()
 }));
 
 // Request password reset
 export type RequestResetPasswordRequest = RequestSchema<{
-  email: string,
-  password: string
+  email: string
 }>;
 
 export const requestResetPasswordSchema = validateRequest(Joi.object({

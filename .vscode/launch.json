@@ -8,7 +8,7 @@
             "type": "node",
             "request": "attach",
             "name": "Node",
-            "port": 9229,
+            "port": 3029,
             "address": "localhost",
             "restart": true,
             "sourceMaps": true,

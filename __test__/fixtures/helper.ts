@@ -1,6 +1,7 @@
 import { User } from 'models';
-import { SuperTest, Test } from 'supertest';
-import { serviceConsumerToken } from 'config/variables';
+import { Response, SuperTest, Test } from 'supertest';
+import jwt from 'jsonwebtoken';
+import { cookies, jwtSecret } from 'config/variables';
 
 type TestUser = {
   credentials: {
@@ -24,36 +25,78 @@ const getUserData = (): TestUser => ({
   ...testUser, ...testUser.credentials
 });
 
+// Generate an non authenticated access token (that will not be tight to a user)
+const getNotAuthenticatedToken = (): string => jwt.sign({}, jwtSecret);
+
+// Get cookie by it's name from header
+const getCookiesFromHeaders = (headers: {'set-cookie': string[]}, cookieName: string): string[] => headers['set-cookie'].filter((cookie: string) => cookie.includes(cookieName));
+
+// Get only the token from the auth cookies
+const getTokenFromAuthCookies = (cookiesToFilter: string[]): string => cookiesToFilter.filter((cookie) => cookie.split('=')[0] === cookies.AuthCookieName)[0].split('=')[1].split(';')[0];
+
+// CSRF
+// Mutable security tokens info
+type SecurityTokens = {
+  csrfToken: string,
+  sessionCookies: string[]
+};
+
+const security: SecurityTokens = {
+  csrfToken     : '',
+  sessionCookies: []
+};
+
+// Set the CSRF token with the associate session token
+const setCsrfAndSess = ({ body, headers }: Response): void => {
+
+  // Extract session cookie from header
+  const sessionCookies: string[] = getCookiesFromHeaders(headers, cookies.SessionCookieName);
+
+  security.csrfToken = body.csrf;
+  security.sessionCookies = sessionCookies;
+
+};
+
+const getCsrfAndSess = (): SecurityTokens => security;
+
 const getFreshToken = async (request: SuperTest<Test>): Promise<{
-  user: User, token: string | undefined
+  user: User, authCookies: string[], token: string
 }> => {
 
+  const serviceConsumerToken = getNotAuthenticatedToken();
+  const { csrfToken, sessionCookies } = getCsrfAndSess();
   const { credentials } = getUserData();
 
-  await request
+  const response = await request
     .post('/api/v1/login')
+    .set('csrf-token', csrfToken)
     .set('Authorization', `Bearer ${serviceConsumerToken}`)
-    .send({ ...credentials });
+    .set('Cookie', sessionCookies)
+    .send(credentials);
 
   const user = await User.query()
     .findOne({ email: credentials.email })
     .withGraphFetched('tokens(orderByCreation)');
 
-  let tokenToReturn;
+  // Get auth cookie from response
+  const authCookies = getCookiesFromHeaders(response.headers, cookies.AuthCookieName);
 
-  if (user.tokens) {
-
-    tokenToReturn = user.tokens[0].token;
-
-  }
+  // Get only the token from the auth cookie
+  // The token is in the auth cookie between "=" and ";"
+  const token = getTokenFromAuthCookies(authCookies);
 
   return {
-    user, token: tokenToReturn
+    user, authCookies, token
   };
 
 };
 
 export {
+  getCookiesFromHeaders,
   getFreshToken,
-  getUserData
+  getUserData,
+  getTokenFromAuthCookies,
+  getNotAuthenticatedToken,
+  setCsrfAndSess,
+  getCsrfAndSess
 };

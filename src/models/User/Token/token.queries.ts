@@ -1,12 +1,13 @@
-/* eslint-disable import/no-cycle */
-import { ExpiredTokenError, NotAuthenticatedError } from 'config/errors/error.types';
-import { jwtSecret } from 'config/variables';
+
+import { NotAuthenticatedError } from 'config/errors/error.types';
+import { encryptionKey, jwtSecret } from 'config/variables';
 import jwt from 'jsonwebtoken';
-import UserAgent from 'koa-useragent/dist/lib/useragent';
+import { User } from 'models';
 import BaseQueryBuilder from 'models/Base.queries';
 import { Model, Page, PartialModelGraph } from 'objection';
+import { EncodedJWTData, ReturnToken, StatefulNotAuthContext } from 'types';
 import { getDevice } from 'utils/userAgent';
-import User from '../User';
+import { AES } from 'crypto-js';
 import Token from './Token';
 
 export default class TokenQueryBuilder<M extends Model, R = M[]>
@@ -19,7 +20,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
   PageQueryBuilderType!: TokenQueryBuilder<M, Page<M>>;
 
   // Validate token, if it exist and if it is not expired than return it with the attached user
-  async tokenWithUserGraphIfValid(token: string): Promise<Token> {
+  async validateToken(token: string): Promise<Token> {
 
     const foundToken = (await this
       .findOne('token', token)
@@ -35,7 +36,7 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
     if (foundToken.expiration && foundToken.expiration < new Date()) {
 
       // If the token is expired throw a NotAuthenticatedError user
-      throw new ExpiredTokenError();
+      throw new NotAuthenticatedError();
 
     }
 
@@ -47,12 +48,25 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
   // By default the token will be temporary
   // If temporary it will have an expiration date
   async generateAuthToken(
+    ctx: StatefulNotAuthContext,
     user: User,
-    userAgent: UserAgent,
-    temporary = false
+    temporary = true
   ): Promise<ReturnToken> {
 
-    const token = jwt.sign({ id: user.id }, jwtSecret);
+    const { userAgent } = ctx;
+
+    // Encrypt user data stored in the JWT token
+    const encryptedJWTData = AES.encrypt(
+      JSON.stringify(
+        {
+          id   : user.id,
+          uuid : user.uuid,
+          admin: user.admin
+        } as EncodedJWTData
+      ), encryptionKey
+    ).toString();
+
+    const token = jwt.sign(encryptedJWTData, jwtSecret);
 
     // If the token is temporary it will expire in one hour
     let date = null;
@@ -73,15 +87,17 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
 
     // Insert the token and relate it to the user
     await this.insertGraph(
-      ({
+      {
         token,
         expiration: date,
         device    : getDevice(userAgent),
-        user,
-      }) as unknown as PartialModelGraph<M>, {
+        user      : { id: user.id },
+      } as unknown as PartialModelGraph<M>, {
         relate: true
       }
     );
+
+    Token.setCookies(ctx, token, user, temporary);
 
     return {
       token, expiration: date
@@ -99,10 +115,10 @@ export default class TokenQueryBuilder<M extends Model, R = M[]>
   }
 
   // Revoke all auth tokens from the user
-  async revokeAllAuthTokens(user: User): Promise<number> {
+  async revokeAllAuthTokens(currentUser: User): Promise<number> {
 
     return this
-      .where({ userId: user.id })
+      .where({ userId: currentUser.id })
       .delete();
 
   }

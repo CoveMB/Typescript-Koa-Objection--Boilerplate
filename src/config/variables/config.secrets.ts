@@ -1,4 +1,4 @@
-import joi from '@hapi/joi';
+import joi from 'joi';
 import { ConfigError } from 'config/errors/error.types';
 import { Secret } from 'jsonwebtoken';
 
@@ -8,6 +8,8 @@ import { Secret } from 'jsonwebtoken';
 const envSchema = joi
   .object({
     JWT_SECRET     : joi.string().required(),
+    CSRF_SECRET    : joi.string().required(),
+    ENCRYPTION_KEY : joi.string().required(),
     SENDGRID_SECRET: joi.string().required(),
     EMAIL_FROM     : joi.string()
       .allow('')
@@ -17,8 +19,7 @@ const envSchema = joi
       .required(),
     SENTRY_ENVIRONMENT: joi.string()
       .allow('')
-      .optional(),
-    SERVICE_CONSUMER_TOKEN: joi.string().required(),
+      .optional()
   })
   .unknown()
   .required();
@@ -34,9 +35,10 @@ if (error) {
 
 }
 
-export const jwtSecret = envVars.JWT_SECRET as Secret;
-export const sendGridSecret = envVars.SENDGRID_SECRET;
-export const sentryDNS = envVars.SENTRY_DNS;
-export const sentryEnv = envVars.SENTRY_ENVIRONMENT;
-export const emailFrom = envVars.EMAIL_FROM;
-export const serviceConsumerToken = envVars.SERVICE_CONSUMER_TOKEN;
+export const jwtSecret: Secret = envVars.JWT_SECRET;
+export const csrfSecret: string = envVars.CSRF_SECRET;
+export const encryptionKey: string = envVars.ENCRYPTION_KEY;
+export const sendGridSecret: string = envVars.SENDGRID_SECRET;
+export const sentryDNS: string = envVars.SENTRY_DNS;
+export const sentryEnv: string = envVars.SENTRY_ENVIRONMENT;
+export const emailFrom: string = envVars.EMAIL_FROM;
